@@ -2,14 +2,13 @@
 <html itemscope itemtype="http://schema.org/Map" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
 <head>
     <meta charset="utf-8"/>
-    <title>earth :: an animated map of global wind and weather</title>
-    <meta itemprop="name"                                      content="地球"/>
-    <meta itemprop="description"     name="description"        content="世界中の天気状況がビジュアライズ"/>
-    <meta itemprop="author"          name="author"             content="Cameron Beccario"/>
+    <title>rocketearth</title>
+    <meta itemprop="name"                                      content="rocketearth"/>
+    <meta itemprop="description"     name="description"        content="View upcoming and historical rocket launch data."/>
 
     <meta property="og:type"        content="website"/>
-    <meta property="og:title"       content="地球"/>
-    <meta property="og:description" content="世界中の天気状況がビジュアライズ。コミュニティはこちらへ：https://www.facebook.com/EarthWindMap"/>
+    <meta property="og:title"       content="rocketearth"/>
+    <meta property="og:description" content="An animated map of past and present rocket launches."/>
     <meta property="og:url"         content="http://earth.nullschool.net"/>
     <meta property="og:image"       content="http://earth.nullschool.net/preview.jpg"/>
 
@@ -31,12 +30,6 @@
         <canvas id="overlay" class="fill-screen"></canvas>
         <svg id="foreground" class="fill-screen" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
     </div>
-
-    <div id="sponsor" class="invisible">
-        <p><span id="sponsor-hide" class="text-button invisible"> ✕ </span>コミュニティ</p>
-        <a id="sponsor-link" href="https://www.facebook.com/EarthWindMap">EarthWindMap</a>
-    </div>
-
     <div id="details">
         <p id="status"></p>
         <div id="location">
@@ -55,7 +48,7 @@
         </div>
 
         <p id="earth">
-            <span id="show-menu" class="text-button" title="menu">地球</span>
+            <span id="show-menu" class="text-button" title="menu">rocketearth</span>
             <span id="progress" class="invisible"></span>
         </p>
 
@@ -112,17 +105,9 @@
             </p>
             <p class="ocean-mode invisible"><span style="visibility:hidden">レイヤー</span> |</p>
             <p>投影法 | <span
-                class="proj text-button" id="atlantis" title="アトランティス">A</span> – <span
-                class="proj text-button" id="azimuthal_equidistant" title="正距方位">AE</span> – <span
-                class="proj text-button" id="conic_equidistant" title="正距円錐">CE</span> – <span
                 class="proj text-button" id="equirectangular" title="正距円筒">E</span> – <span
                 class="proj text-button" id="orthographic" title="正射">O</span> – <span
-                class="proj text-button" id="stereographic" title="平射">S</span> – <span
-                class="proj text-button" id="waterman" title="ウォーターマン蝶型">WB</span> – <span
-                class="proj text-button" id="winkel3" title="ヴィンケル第3">W3</span>
             </p>
-            <!--<p>免責事項 | 正確な情報を提供するためのものではありません</p>-->
-            <p id="lang"><a href="/" class="internal-link">English</a></p>
             <p>
                 <a href="about.html" class="internal-link">サイトについて</a>
                 <a href="https://www.facebook.com/EarthWindMap" class="social-icon" title="Facebook">&#xe027;</a>

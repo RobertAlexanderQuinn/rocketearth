@@ -1,21 +1,17 @@
 {
-    "name": "earth",
-    "description": "Earth",
+    "name": "rocketearth",
+    "description": "rocketearth",
     "version": "0.0.1",
     "private": true,
-    "author": {
-        "name": "Cameron Beccario",
-        "email": "cambecc@nullschool.net"
-    },
     "scripts": {
         "start": "node dev-server.js"
     },
-    "homepage": "https://github.com/cambecc/earth",
+    "homepage": "https://github.com/oising/rocketearth",
     "repository": {
         "type": "git",
-        "url": "git://github.com/cambecc/earth.git"
+        "url": "git://github.com/oising/rocketearth.git"
     },
-    "engine": "node >= 0.10.21",
+    "engine": "node >= 8.0.0",
     "dependencies": {
         "compression": "^1.7.3",
         "express": "4.16.4",

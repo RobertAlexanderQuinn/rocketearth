@@ -6,14 +6,13 @@
 <html itemscope itemtype="http://schema.org/Map" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
 <head>
     <meta charset="utf-8"/>
-    <title>earth :: an animated map of global wind and weather</title>
-    <meta itemprop="name"                                      content="{{__('earth')}}"/>
-    <meta itemprop="description"     name="description"        content="{{__('an animated map of global wind and weather')}}"/>
-    <meta itemprop="author"          name="author"             content="Cameron Beccario"/>
+    <title>rocketearth</title>
+    <meta itemprop="name"                                      content="{{__('rocketearth')}}"/>
+    <meta itemprop="description"     name="description"        content="{{__('View upcoming and historical rocket launch data.')}}"/>
 
     <meta property="og:type"        content="website"/>
-    <meta property="og:title"       content="{{__('earth')}}"/>
-    <meta property="og:description" content="{{__('An animated map of global wind and weather. Visit the community at https://www.facebook.com/EarthWindMap')}}"/>
+    <meta property="og:title"       content="{{__('rocketearth')}}"/>
+    <meta property="og:description" content="{{__('An animated map of past and present rocket launches.')}}"/>
     <meta property="og:url"         content="http://earth.nullschool.net"/>
     <meta property="og:image"       content="http://earth.nullschool.net/preview.jpg"/>
 
@@ -35,12 +34,6 @@
         <canvas id="overlay" class="fill-screen"></canvas>
         <svg id="foreground" class="fill-screen" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
     </div>
-
-    <div id="sponsor" class="invisible">
-        <p><span id="sponsor-hide" class="text-button invisible"> ✕ </span>{{__('community')}}</p>
-        <a id="sponsor-link" href="https://www.facebook.com/EarthWindMap">EarthWindMap</a>
-    </div>
-
     <div id="details">
         <p id="status"></p>
         <div id="location">
@@ -59,7 +52,7 @@
         </div>
 
         <p id="earth">
-            <span id="show-menu" class="text-button" title="menu">{{__('earth')}}</span>
+            <span id="show-menu" class="text-button" title="menu">{{__('rocketearth')}}</span>
             <span id="progress" class="invisible"></span>
         </p>
 
@@ -116,17 +109,9 @@
             </p>
             <p class="ocean-mode invisible"><span style="visibility:hidden">{{__('Overlay')}}</span> |</p>
             <p>{{__('Projection')}} | <span
-                class="proj text-button" id="atlantis" title="{{__('Atlantis')}}">A</span> – <span
-                class="proj text-button" id="azimuthal_equidistant" title="{{__('Azimuthal Equidistant')}}">AE</span> – <span
-                class="proj text-button" id="conic_equidistant" title="{{__('Conic Equidistant')}}">CE</span> – <span
                 class="proj text-button" id="equirectangular" title="{{__('Equirectangular')}}">E</span> – <span
                 class="proj text-button" id="orthographic" title="{{__('Orthographic')}}">O</span> – <span
-                class="proj text-button" id="stereographic" title="{{__('Stereographic')}}">S</span> – <span
-                class="proj text-button" id="waterman" title="{{__('Waterman Butterfly')}}">WB</span> – <span
-                class="proj text-button" id="winkel3" title="{{__('Winkel Tripel')}}">W3</span>
             </p>
-            <!--<p>免責事項 | 正確な情報を提供するためのものではありません</p>-->
-            <p id="lang"><a href="{{__('/jp')}}" class="internal-link">{{__('日本語')}}</a></p>
             <p>
                 <a href="about.html" class="internal-link">{{__('about')}}</a>
                 <a href="https://www.facebook.com/EarthWindMap" class="social-icon" title="Facebook">&#xe027;</a>
