@@ -369,6 +369,21 @@
       }
     }
 
+    function drawLaunchpads(coord) {
+      var mark = d3.select('.location-mark');
+      mark = d3
+        .select('#foreground')
+        .append('path')
+        .attr('class', 'location-mark');
+      mark.datum({ type: 'Point', coordinates: coord }).attr('d', path);
+    }
+
+    µ.loadJson('/site').then(data => {
+      data.pads.forEach(pad => {
+        drawLaunchpads([pad.longitude, pad.latitude]);
+      });
+    });
+
     // Draw the location mark if one is currently visible.
     if (activeLocation.point && activeLocation.coord) {
       drawLocationMark(activeLocation.point, activeLocation.coord);
