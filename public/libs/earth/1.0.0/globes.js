@@ -265,6 +265,9 @@ var globes = (function() {
           .equirectangular()
           .rotate(currentPosition())
           .precision(0.1);
+      },
+      scaleExtent: function() {
+        return [280, 3000];
       }
     });
   }
