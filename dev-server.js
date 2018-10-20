@@ -9,10 +9,17 @@ console.log(new Date().toISOString() + ' - Starting');
 
 const compression = require('compression');
 const express = require('express');
+const request = require('request');
+const url = require('url');
 const util = require('util');
 
-const PORT = process.argv[2] || 8080;
 const app = express();
+
+const PORT = process.argv[2] || 8080;
+const DARK_SKY_API_KEY = process.env['DARK_SKY_API_KEY'];
+
+const FLIGHT_DATA_URL = 'https://launchlibrary.net/1.4/';
+const DARK_SKY_URL = `https://api.darksky.net/forecast/${DARK_SKY_API_KEY}/{lat},{lng},{time}`;
 
 /**
  * Adds headers to a response to enable caching.
@@ -24,9 +31,77 @@ function cacheControl() {
   };
 }
 
+/**
+ * Simple logging. Add more and make moar better.
+ */
+function log() {
+  return function(req, res, next) {
+    console.log(req.url);
+    return next();
+  };
+}
+
+/**
+ * Promise wrapper for requests because why not.
+ */
+function preq(opt) {
+  return new Promise((resolve, reject) => {
+    request(opt, (err, res, data) => {
+      return err ? reject(err) : resolve(data);
+    });
+  });
+}
+
+/**
+ * Constructs a URL builder for the specified base path.
+ */
+function urlBuilder(base) {
+  return function() {
+    let path = base;
+    for (let i = 0; i < arguments.length; i++) {
+      if (arguments[i] !== undefined) {
+        path = url.resolve(path, arguments[i]) + '/';
+      }
+    }
+    return path;
+  };
+}
+
+// These are functions that construct the paths for requests.
+const flightURL = urlBuilder(FLIGHT_DATA_URL);
+const weatherURL = urlBuilder(DARK_SKY_URL);
+
+/**
+ * Generic error catcher.
+ */
+function errorCatch(err) {
+  console.error(err);
+}
+
 app.use(cacheControl());
 app.use(compression());
 app.use(express.static('public'));
+
+app.get('/site/:siteId?', (req, res) => {
+  preq({
+    url: flightURL('pad', req.params.siteId, '?limit=999999999'),
+    json: true
+  })
+    .then(data => res.json(data))
+    .catch(errorCatch);
+});
+
+app.get('/agency/:agencyId?', (req, res) => {
+  preq({ url: flightURL('agency', req.params.agencyId), json: true })
+    .then(data => res.json(data))
+    .catch(errorCatch);
+});
+
+app.get('/launch/:launchId?', (req, res) => {
+  preq({ url: flightURL('launch', req.params.launchId), json: true })
+    .then(data => res.json(data))
+    .catch(errorCatch);
+});
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}...`);
