@@ -7,7 +7,7 @@
  * https://github.com/cambecc/earth
  */
 var globes = (function() {
-  "use strict";
+  'use strict';
 
   /**
    * @returns {Array} rotation of globe to current position of the user. Aside from asking for geolocation,
@@ -68,7 +68,7 @@ var globes = (function() {
        * @returns {Object} a new D3 projection of this globe appropriate for the specified view port.
        */
       newProjection: function(view) {
-        throw new Error("method must be overridden");
+        throw new Error('method must be overridden');
       },
 
       /**
@@ -81,7 +81,7 @@ var globes = (function() {
           d3.geo
             .path()
             .projection(this.projection)
-            .bounds({ type: "Sphere" }),
+            .bounds({ type: 'Sphere' }),
           view
         );
       },
@@ -95,7 +95,7 @@ var globes = (function() {
         var bounds = d3.geo
           .path()
           .projection(defaultProjection)
-          .bounds({ type: "Sphere" });
+          .bounds({ type: 'Sphere' });
         var hScale = (bounds[1][0] - bounds[0][0]) / defaultProjection.scale();
         var vScale = (bounds[1][1] - bounds[0][1]) / defaultProjection.scale();
         return Math.min(view.width / hScale, view.height / vScale) * 0.9;
@@ -127,7 +127,7 @@ var globes = (function() {
         var projection = this.projection,
           rotate = projection.rotate();
         if (µ.isValue(o)) {
-          var parts = o.split(","),
+          var parts = o.split(','),
             λ = +parts[0],
             φ = +parts[1],
             scale = +parts[2];
@@ -149,7 +149,7 @@ var globes = (function() {
           (-rotate[0]).toFixed(2),
           (-rotate[1]).toFixed(2),
           Math.round(projection.scale())
-        ].join(",");
+        ].join(',');
       },
 
       /**
@@ -204,7 +204,7 @@ var globes = (function() {
         d3.geo
           .path()
           .projection(this.projection)
-          .context(context)({ type: "Sphere" });
+          .context(context)({ type: 'Sphere' });
         return context;
       },
 
@@ -215,37 +215,37 @@ var globes = (function() {
        */
       defineMap: function(mapSvg, foregroundSvg) {
         var path = d3.geo.path().projection(this.projection);
-        var defs = mapSvg.append("defs");
+        var defs = mapSvg.append('defs');
         defs
-          .append("path")
-          .attr("id", "sphere")
-          .datum({ type: "Sphere" })
-          .attr("d", path);
+          .append('path')
+          .attr('id', 'sphere')
+          .datum({ type: 'Sphere' })
+          .attr('d', path);
         mapSvg
-          .append("use")
-          .attr("xlink:href", "#sphere")
-          .attr("class", "background-sphere");
+          .append('use')
+          .attr('xlink:href', '#sphere')
+          .attr('class', 'background-sphere');
         mapSvg
-          .append("path")
-          .attr("class", "graticule")
+          .append('path')
+          .attr('class', 'graticule')
           .datum(d3.geo.graticule())
-          .attr("d", path);
+          .attr('d', path);
         mapSvg
-          .append("path")
-          .attr("class", "hemisphere")
+          .append('path')
+          .attr('class', 'hemisphere')
           .datum(
             d3.geo
               .graticule()
               .minorStep([0, 90])
               .majorStep([0, 90])
           )
-          .attr("d", path);
-        mapSvg.append("path").attr("class", "coastline");
-        mapSvg.append("path").attr("class", "lakes");
+          .attr('d', path);
+        mapSvg.append('path').attr('class', 'coastline');
+        mapSvg.append('path').attr('class', 'lakes');
         foregroundSvg
-          .append("use")
-          .attr("xlink:href", "#sphere")
-          .attr("class", "foreground-sphere");
+          .append('use')
+          .attr('xlink:href', '#sphere')
+          .attr('class', 'foreground-sphere');
       }
     };
   }
@@ -317,56 +317,56 @@ var globes = (function() {
       },
       defineMap: function(mapSvg, foregroundSvg) {
         var path = d3.geo.path().projection(this.projection);
-        var defs = mapSvg.append("defs");
+        var defs = mapSvg.append('defs');
         var gradientFill = defs
-          .append("radialGradient")
-          .attr("id", "orthographic-fill")
-          .attr("gradientUnits", "objectBoundingBox")
-          .attr("cx", "50%")
-          .attr("cy", "49%")
-          .attr("r", "50%");
+          .append('radialGradient')
+          .attr('id', 'orthographic-fill')
+          .attr('gradientUnits', 'objectBoundingBox')
+          .attr('cx', '50%')
+          .attr('cy', '49%')
+          .attr('r', '50%');
         gradientFill
-          .append("stop")
-          .attr("stop-color", "#303030")
-          .attr("offset", "69%");
+          .append('stop')
+          .attr('stop-color', '#303030')
+          .attr('offset', '69%');
         gradientFill
-          .append("stop")
-          .attr("stop-color", "#202020")
-          .attr("offset", "91%");
+          .append('stop')
+          .attr('stop-color', '#202020')
+          .attr('offset', '91%');
         gradientFill
-          .append("stop")
-          .attr("stop-color", "#000005")
-          .attr("offset", "96%");
+          .append('stop')
+          .attr('stop-color', '#000005')
+          .attr('offset', '96%');
         defs
-          .append("path")
-          .attr("id", "sphere")
-          .datum({ type: "Sphere" })
-          .attr("d", path);
+          .append('path')
+          .attr('id', 'sphere')
+          .datum({ type: 'Sphere' })
+          .attr('d', path);
         mapSvg
-          .append("use")
-          .attr("xlink:href", "#sphere")
-          .attr("fill", "url(#orthographic-fill)");
+          .append('use')
+          .attr('xlink:href', '#sphere')
+          .attr('fill', 'url(#orthographic-fill)');
         mapSvg
-          .append("path")
-          .attr("class", "graticule")
+          .append('path')
+          .attr('class', 'graticule')
           .datum(d3.geo.graticule())
-          .attr("d", path);
+          .attr('d', path);
         mapSvg
-          .append("path")
-          .attr("class", "hemisphere")
+          .append('path')
+          .attr('class', 'hemisphere')
           .datum(
             d3.geo
               .graticule()
               .minorStep([0, 90])
               .majorStep([0, 90])
           )
-          .attr("d", path);
-        mapSvg.append("path").attr("class", "coastline");
-        mapSvg.append("path").attr("class", "lakes");
+          .attr('d', path);
+        mapSvg.append('path').attr('class', 'coastline');
+        mapSvg.append('path').attr('class', 'lakes');
         foregroundSvg
-          .append("use")
-          .attr("xlink:href", "#sphere")
-          .attr("class", "foreground-sphere");
+          .append('use')
+          .attr('xlink:href', '#sphere')
+          .attr('class', 'foreground-sphere');
       },
       locate: function(coord) {
         return [-coord[0], -coord[1], this.projection.rotate()[2]];
