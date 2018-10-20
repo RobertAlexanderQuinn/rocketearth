@@ -7,6 +7,9 @@
         "name": "Cameron Beccario",
         "email": "cambecc@nullschool.net"
     },
+    "scripts": {
+        "start": "node dev-server.js"
+    },
     "homepage": "https://github.com/cambecc/earth",
     "repository": {
         "type": "git",
@@ -17,6 +20,7 @@
         "compression": "^1.7.3",
         "express": "4.16.4",
         "mkdirp": "0.5.1",
+        "request": "^2.88.0",
         "swig": "1.4.2",
         "when": "3.7.8"
     },
