@@ -21,7 +21,7 @@
     <link rel="alternate" hreflang="ja" href="http://earth.nullschool.net/jp/"/>
 </head>
 <body data-lang="en">
-
+<div id="container">
     <!--[if lte IE 8]><p id="warn">This site requires IE9 or newer.</p><![endif]-->
 
     <div id="display">
@@ -59,10 +59,15 @@
         <script type="text/template" id="launch-template">
             <div>
                 <p><%= name %></p>
-                <p>lorem ipsum</p>
+                <p><%= agency %></p>
+                <p>(launch info)</p>
             </div>
         </script>
-        <div id="launch-info" class="invisible">
+        <script type="text/template" id="spaceport-list">
+        </script>
+        <script type="text/template" id="spaceport-item">
+        </script>
+        <div id="launch-info" class="">
             <p>No Data</p>
         </div>
         <div id="menu" class="invisible">
@@ -146,8 +151,6 @@
     <script src="/libs/earth/1.0.0/globes.js" charset="utf-8"></script>
     <script src="/libs/earth/1.0.0/products.js" charset="utf-8"></script>
     <script src="/libs/earth/1.0.0/earth.js" charset="utf-8"></script>
-
-    <script id="menu-root" type="text/html">
-    </script>
+</div>
 </body>
 </html>

@@ -33,6 +33,14 @@ html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, svg, canvas {
 /**************************************************************************************************
  * Page Styling
  **************************************************************************************************/
+body {
+    height: 100%;
+}
+
+ #container {
+    min-height: 100%;
+    position: relative;
+}
 
 a, .text-button {
     color: #888888;
@@ -158,6 +166,12 @@ body {
 
 #scrubber {
     position: absolute;
+    pointer-events: none;
+}
+
+#maxRange, #minRange {
+    pointer-events: all;
+    cursor: ew-resize;
 }
 
 #timeline-min-date {
