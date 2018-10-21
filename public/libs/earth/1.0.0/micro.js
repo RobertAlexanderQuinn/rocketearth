@@ -7,14 +7,14 @@
  * https://github.com/cambecc/earth
  */
 var µ = (function() {
-  "use strict";
+  'use strict';
 
   var τ = 2 * Math.PI;
   var H = 0.000036; // 0.0000360°φ ~= 4m
-  var DEFAULT_CONFIG = "current/wind/surface/level/orthographic";
+  var DEFAULT_CONFIG = 'current/wind/surface/level/orthographic';
   var TOPOLOGY = isMobile()
-    ? "/data/earth-topo-mobile.json?v2"
-    : "/data/earth-topo.json?v2";
+    ? '/data/earth-topo-mobile.json?v2'
+    : '/data/earth-topo.json?v2';
 
   /**
    * @returns {Boolean} true if the specified value is truthy.
@@ -86,7 +86,7 @@ var µ = (function() {
   function zeroPad(n, width) {
     var s = n.toString();
     var i = Math.max(width - s.length, 0);
-    return new Array(i + 1).join("0") + s;
+    return new Array(i + 1).join('0') + s;
   }
 
   /**
@@ -119,26 +119,26 @@ var µ = (function() {
   function toUTCISO(date) {
     return (
       date.getUTCFullYear() +
-      "-" +
+      '-' +
       zeroPad(date.getUTCMonth() + 1, 2) +
-      "-" +
+      '-' +
       zeroPad(date.getUTCDate(), 2) +
-      " " +
+      ' ' +
       zeroPad(date.getUTCHours(), 2) +
-      ":00"
+      ':00'
     );
   }
 
   function toLocalISO(date) {
     return (
       date.getFullYear() +
-      "-" +
+      '-' +
       zeroPad(date.getMonth() + 1, 2) +
-      "-" +
+      '-' +
       zeroPad(date.getDate(), 2) +
-      " " +
+      ' ' +
       zeroPad(date.getHours(), 2) +
-      ":00"
+      ':00'
     );
   }
 
@@ -165,13 +165,13 @@ var µ = (function() {
    *          delimiter (and may be the empty string).
    */
   function dateToUTCymd(date, delimiter) {
-    return ymdRedelimit(date.toISOString(), "-", delimiter || "");
+    return ymdRedelimit(date.toISOString(), '-', delimiter || '');
   }
 
   function dateToConfig(date) {
     return {
-      date: µ.dateToUTCymd(date, "/"),
-      hour: µ.zeroPad(date.getUTCHours(), 2) + "00"
+      date: µ.dateToUTCymd(date, '/'),
+      hour: µ.zeroPad(date.getUTCHours(), 2) + '00'
     };
   }
 
@@ -180,7 +180,7 @@ var µ = (function() {
    */
   function log() {
     function format(o) {
-      return o && o.stack ? o + "\n" + o.stack : o;
+      return o && o.stack ? o + '\n' + o.stack : o;
     }
     return {
       debug: function(s) {
@@ -207,7 +207,7 @@ var µ = (function() {
   function view() {
     var w = window;
     var d = document && document.documentElement;
-    var b = document && document.getElementsByTagName("body")[0];
+    var b = document && document.getElementsByTagName('body')[0];
     var x = w.innerWidth || d.clientWidth || b.clientWidth;
     var y = w.innerHeight || d.clientHeight || b.clientHeight;
     return { width: x, height: y };
@@ -226,7 +226,7 @@ var µ = (function() {
    * @returns {Object} clears and returns the specified Canvas element's 2d context.
    */
   function clearCanvas(canvas) {
-    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
     return canvas;
   }
 
@@ -286,7 +286,7 @@ var µ = (function() {
   }
 
   function asColorStyle(r, g, b, a) {
-    return "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
+    return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
   }
 
   /**
@@ -345,12 +345,12 @@ var µ = (function() {
   function formatCoordinates(λ, φ) {
     return (
       Math.abs(φ).toFixed(2) +
-      "° " +
-      (φ >= 0 ? "N" : "S") +
-      ", " +
+      '° ' +
+      (φ >= 0 ? 'N' : 'S') +
+      ', ' +
       Math.abs(λ).toFixed(2) +
-      "° " +
-      (λ >= 0 ? "E" : "W")
+      '° ' +
+      (λ >= 0 ? 'E' : 'W')
     );
   }
 
@@ -368,7 +368,7 @@ var µ = (function() {
   function formatVector(wind, units) {
     var d = (Math.atan2(-wind[0], -wind[1]) / τ) * 360; // calculate into-the-wind cardinal degrees
     var wd = Math.round(((d + 360) % 360) / 5) * 5; // shift [-180, 180] to [0, 360], and round to nearest 5.
-    return wd.toFixed(0) + "° @ " + formatScalar(wind[2], units);
+    return wd.toFixed(0) + '° @ ' + formatScalar(wind[2], units);
   }
 
   /**
@@ -382,7 +382,7 @@ var µ = (function() {
         ? !error.status
           ? d.reject({
               status: -1,
-              message: "Cannot load resource: " + resource,
+              message: 'Cannot load resource: ' + resource,
               resource: resource
             })
           : d.reject({
@@ -503,19 +503,19 @@ var µ = (function() {
       function accept(result) {
         if (!cancel.requested) {
           value = result;
-          agent.trigger("update", result, agent);
+          agent.trigger('update', result, agent);
         }
       }
 
       function reject(err) {
         if (!cancel.requested) {
           // ANNOYANCE: when cancelled, this task's error is silently suppressed
-          agent.trigger("reject", err, agent);
+          agent.trigger('reject', err, agent);
         }
       }
 
       function fail(err) {
-        agent.trigger("fail", err, agent);
+        agent.trigger('fail', err, agent);
       }
 
       try {
@@ -526,7 +526,7 @@ var µ = (function() {
           .then(run)
           .then(accept, reject)
           .done(undefined, fail);
-        agent.trigger("submit", agent);
+        agent.trigger('submit', agent);
       } catch (err) {
         fail(err);
       }
@@ -590,40 +590,40 @@ var µ = (function() {
     );
     if (tokens) {
       var date =
-        tokens[1] === "current"
-          ? "current"
+        tokens[1] === 'current'
+          ? 'current'
           : tokens[2] +
-            "/" +
+            '/' +
             zeroPad(tokens[3], 2) +
-            "/" +
+            '/' +
             zeroPad(tokens[4], 2);
-      var hour = isValue(tokens[5]) ? zeroPad(tokens[5], 4) : "";
+      var hour = isValue(tokens[5]) ? zeroPad(tokens[5], 4) : '';
       result = {
         date: date, // "current" or "yyyy/mm/dd"
         hour: hour, // "hhhh" or ""
         param: tokens[6], // non-empty alphanumeric _
         surface: tokens[7], // non-empty alphanumeric _
         level: tokens[8], // non-empty alphanumeric _
-        projection: "orthographic",
-        orientation: "",
+        projection: 'orthographic',
+        orientation: '',
         topology: TOPOLOGY,
-        overlayType: "default",
+        overlayType: 'default',
         showGridPoints: false
       };
-      coalesce(tokens[9], "")
-        .split("/")
+      coalesce(tokens[9], '')
+        .split('/')
         .forEach(function(segment) {
           if ((option = /^(\w+)(=([\d\-.,]*))?$/.exec(segment))) {
             if (projectionNames.has(option[1])) {
               result.projection = option[1]; // non-empty alphanumeric _
-              result.orientation = coalesce(option[3], ""); // comma delimited string of numbers, or ""
+              result.orientation = coalesce(option[3], ''); // comma delimited string of numbers, or ""
             }
           } else if ((option = /^overlay=(\w+)$/.exec(segment))) {
-            if (overlayTypes.has(option[1]) || option[1] === "default") {
+            if (overlayTypes.has(option[1]) || option[1] === 'default') {
               result.overlayType = option[1];
             }
           } else if ((option = /^grid=(\w+)$/.exec(segment))) {
-            if (option[1] === "on") {
+            if (option[1] === 'on') {
               result.showGridPoints = true;
             }
           }
@@ -648,16 +648,16 @@ var µ = (function() {
     toHash: function() {
       var attr = this.attributes;
       var dir =
-        attr.date === "current" ? "current" : attr.date + "/" + attr.hour + "Z";
-      var proj = [attr.projection, attr.orientation].filter(isTruthy).join("=");
+        attr.date === 'current' ? 'current' : attr.date + '/' + attr.hour + 'Z';
+      var proj = [attr.projection, attr.orientation].filter(isTruthy).join('=');
       var ol =
-        !isValue(attr.overlayType) || attr.overlayType === "default"
-          ? ""
-          : "overlay=" + attr.overlayType;
-      var grid = attr.showGridPoints ? "grid=on" : "";
+        !isValue(attr.overlayType) || attr.overlayType === 'default'
+          ? ''
+          : 'overlay=' + attr.overlayType;
+      var grid = attr.showGridPoints ? 'grid=on' : '';
       return [dir, attr.param, attr.surface, attr.level, ol, proj, grid]
         .filter(isTruthy)
-        .join("/");
+        .join('/');
     },
 
     /**
@@ -666,9 +666,9 @@ var µ = (function() {
      */
     sync: function(method, model, options) {
       switch (method) {
-        case "read":
+        case 'read':
           if (
-            options.trigger === "hashchange" &&
+            options.trigger === 'hashchange' &&
             model._ignoreNextHashChangeEvent
           ) {
             model._ignoreNextHashChangeEvent = false;
@@ -682,7 +682,7 @@ var µ = (function() {
             )
           );
           break;
-        case "update":
+        case 'update':
           // Ugh. Setting the hash fires a hashchange event during the next event loop turn. Ignore it.
           model._ignoreNextHashChangeEvent = true;
           window.location.hash = model.toHash();

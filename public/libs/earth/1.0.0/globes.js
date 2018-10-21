@@ -113,7 +113,7 @@ var globes = (function() {
        * @returns {Array} the range at which this globe can be zoomed.
        */
       scaleExtent: function() {
-        return [25, 3000];
+        return [300, 3000];
       },
 
       /**
@@ -265,6 +265,9 @@ var globes = (function() {
           .equirectangular()
           .rotate(currentPosition())
           .precision(0.1);
+      },
+      scaleExtent: function() {
+        return [280, 3000];
       }
     });
   }

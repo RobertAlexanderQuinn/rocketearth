@@ -15,7 +15,7 @@
   var MAX_TASK_TIME = 100; // amount of time before a task yields control (millis)
   var MIN_SLEEP_TIME = 25; // amount of time a task waits before resuming (millis)
   var MIN_MOVE = 4; // slack before a drag operation beings (pixels)
-  var MOVE_END_WAIT = 1000; // time to wait for a move operation to be considered done (millis)
+  var MOVE_END_WAIT = 50; // time to wait for a move operation to be considered done (millis)
 
   var OVERLAY_ALPHA = Math.floor(0.4 * 255); // overlay transparency (on scale [0, 255])
   var INTENSITY_SCALE_STEP = 10; // step size of particle intensity color scale
@@ -752,43 +752,11 @@
       grid = (gridAgent.value() || {}).overlayGrid;
 
     µ.clearCanvas(d3.select('#overlay').node());
-    µ.clearCanvas(d3.select('#scale').node());
     if (overlayType) {
       if (overlayType !== 'off') {
         ctx.putImageData(field.overlay, 0, 0);
       }
       drawGridPoints(ctx, grid, globeAgent.value());
-    }
-
-    if (grid) {
-      // Draw color bar for reference.
-      var colorBar = d3.select('#scale'),
-        scale = grid.scale,
-        bounds = scale.bounds;
-      var c = colorBar.node(),
-        g = c.getContext('2d'),
-        n = c.width - 1;
-      for (var i = 0; i <= n; i++) {
-        var rgb = scale.gradient(µ.spread(i / n, bounds[0], bounds[1]), 1);
-        g.fillStyle = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
-        g.fillRect(i, 0, 1, c.height);
-      }
-
-      // Show tooltip on hover.
-      colorBar.on('mousemove', function() {
-        var x = d3.mouse(this)[0];
-        var pct = µ.clamp((Math.round(x) - 2) / (n - 2), 0, 1);
-        var value = µ.spread(pct, bounds[0], bounds[1]);
-        var elementId =
-          grid.type === 'wind'
-            ? '#location-wind-units'
-            : '#location-value-units';
-        var units = createUnitToggle(elementId, grid).value();
-        colorBar.attr(
-          'title',
-          µ.formatScalar(value, units) + ' ' + units.label
-        );
-      });
     }
   }
 
@@ -966,11 +934,13 @@
   }
 
   /**
-   * Registers a click event handler for the specified DOM element which modifies the configuration to have
-   * the attributes represented by newAttr. An event listener is also registered for configuration change events,
-   * so when a change occurs the button becomes highlighted (i.e., class ".highlighted" is assigned or removed) if
-   * the configuration matches the attributes for this button. The set of attributes used for the matching is taken
-   * from newAttr, unless a custom set of keys is provided.
+   * Registers a click event handler for the specified DOM element which modifies the
+   * configuration to have the attributes represented by newAttr. An event listener is
+   * also registered for configuration change events, so when a change occurs the
+   * button becomes highlighted (i.e., class ".highlighted" is assigned or removed) if
+   * the configuration matches the attributes for this button. The set of attributes
+   * used for the matching is taken from newAttr, unless a custom set of keys is
+   * provided.
    */
   function bindButtonToConfiguration(elementId, newAttr, keys) {
     keys = keys || _.keys(newAttr);
@@ -987,38 +957,18 @@
     });
   }
 
-  function reportSponsorClick(type) {
-    if (ga) {
-      ga('send', 'event', 'sponsor', type);
-    }
-  }
-
   /**
-   * Registers all event handlers to bind components and page elements together. There must be a cleaner
-   * way to accomplish this...
+   * Registers all event handlers to bind components and page elements together.
+   * There must be a cleaner way to accomplish this...
    */
   function init() {
     report.status('Initializing...');
 
-    d3.select('#sponsor-link')
-      .attr('target', µ.isEmbeddedInIFrame() ? '_new' : null)
-      .on('click', reportSponsorClick.bind(null, 'click'))
-      .on('contextmenu', reportSponsorClick.bind(null, 'right-click'));
-    d3.select('#sponsor-hide').on('click', function() {
-      d3.select('#sponsor').classed('invisible', true);
-    });
-
     d3.selectAll('.fill-screen')
       .attr('width', view.width)
       .attr('height', view.height);
-    // Adjust size of the scale canvas to fill the width of the menu to the right of the label.
-    var label = d3.select('#scale-label').node();
-    d3.select('#scale')
-      .attr(
-        'width',
-        (d3.select('#menu').node().offsetWidth - label.offsetWidth) * 0.97
-      )
-      .attr('height', label.offsetHeight / 2);
+    // Adjust size of the scale canvas to fill the width of the menu to the right of
+    // the label.
 
     d3.select('#show-menu').on('click', function() {
       if (µ.isEmbeddedInIFrame()) {
@@ -1298,8 +1248,8 @@
 
     // Add handlers for all wind level buttons.
     d3.selectAll('.surface').each(function() {
-      var id = this.id,
-        parts = id.split('-');
+      var id = this.id;
+      var parts = id.split('-');
       bindButtonToConfiguration('#' + id, {
         param: 'wind',
         surface: parts[0],
