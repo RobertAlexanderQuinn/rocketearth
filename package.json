@@ -16,6 +16,7 @@
         "compression": "^1.7.3",
         "express": "4.16.4",
         "mkdirp": "0.5.1",
+        "node-cache": "^4.2.0",
         "request": "^2.88.0",
         "swig": "1.4.2",
         "when": "3.7.8"
