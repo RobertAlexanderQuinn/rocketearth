@@ -254,7 +254,7 @@
         );
       minHandle
         .append('rect')
-        .attr('fill', '#00ff00')
+        .attr('fill', '#999999')
         .attr('width', 2)
         .attr('height', 30);
       minHandle
@@ -262,7 +262,7 @@
         .attr('r', 6)
         .attr('cx', 1)
         .attr('cy', 28)
-        .attr('fill', '#00ff00');
+        .attr('fill', '#999999');
 
       // pick up custom class for pointer events
       minHandle.attr("id","minRange");
@@ -286,6 +286,7 @@
 
         // stop drag events from leaking to globe
         d3.event.sourceEvent.stopImmediatePropagation();
+        dispatch.trigger("range:change", { min: minText.text(), max: maxText.text() });
       });
       minHandle.call(minDrag);
 
@@ -302,13 +303,13 @@
         .append('rect')
         .attr('width', 2)
         .attr('height', 30)
-        .attr('fill', '#00ff00');
+        .attr('fill', '#999999');
       maxHandle
         .append('circle')
         .attr('r', 6)
         .attr('cx', 1)
         .attr('cy', 28)
-        .attr('fill', '#00ff00');
+        .attr('fill', '#999999');
       const maxText = maxHandle
         .append('text')
         .text('2018')
@@ -319,7 +320,7 @@
       // pick up mouse events from targetted class
       maxHandle.attr("id", "maxRange");
 
-      const maxDrag = d3.behavior.drag().on('drag', function (d) {        
+      const maxDrag = d3.behavior.drag().on('drag', function (d) {
         const handle = d3.select(this);
         const pos = µ.clamp(
           d3.event.x,
@@ -332,6 +333,7 @@
 
         // stop drag events from leaking to globe
         d3.event.sourceEvent.stopImmediatePropagation();
+        dispatch.trigger("range:change", { min: minText.text(), max: maxText.text() });
       });
       maxHandle.call(maxDrag);
     //}
