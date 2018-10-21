@@ -218,7 +218,7 @@
       .attr('height', 20)
       .attr('x', scrubberPadding)
       .attr('y', view.height - scrubberPadding);
-    scrubber
+    const minText = scrubber
       .append('text')
       .text('1961')
       .attr('font-size', '20px')
@@ -234,7 +234,7 @@
       .attr('height', 20)
       .attr('x', view.width - scrubberPadding)
       .attr('y', view.height - scrubberPadding);
-    scrubber
+    const maxText = scrubber
       .append('text')
       .text('2018')
       .attr('font-size', '20px')
@@ -259,6 +259,7 @@
             +maxHandle.attr('x') - 10
           );
           d3.select(this).attr('x', pos);
+          minText.attr('x', pos);
         })
       );
 
@@ -277,6 +278,7 @@
             view.width - scrubberPadding - 8
           );
           d3.select(this).attr('x', pos);
+          maxText.attr('x', pos + 3);
         })
       );
 
