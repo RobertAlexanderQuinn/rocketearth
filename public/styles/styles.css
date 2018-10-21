@@ -107,15 +107,17 @@ body {
     position: absolute;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    top: 2%;
-    right: 2%;
+    align-items: flex-start;
+    top: 0;
+    right: 0;
+    left: 0;
+    padding: 0 2%;
     pointer-events: none;  /* This div is just a container--do not let it interfere with operation of the map. */
     text-align: right;
 }
 
 #status, #location, #menu {
-    font-size: 1.75rem;
+    font-size: 1rem;
 }
 
 #status, #location, #earth {
@@ -124,7 +126,7 @@ body {
     margin-top: 1rem;
     padding: 0 1rem 0 1rem;
     pointer-events: all;
-    font-size: 2rem;
+    font-size: 1rem;
 }
 
 #menu {
