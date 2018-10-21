@@ -49,19 +49,17 @@
                 <span id="location-value-units" class="text-button"></span>
             </p>
         </div>
-        <p id="earth">
-            <span id="show-menu" class="text-button" title="menu">rocketearth</span>
-            <span id="progress" class="invisible"></span>
-        </p>
         <!-- actually for pad data -->
         <script type="text/template" id="launch-template">
             <div>
                 <p><%= name %></p>
                 <p><%= agency %></p>
-                <p>(launch info)</p>
-                <ul>
-                    <% for (var i = 0; i < launches.length; i++) { %>
+                <ul style="text-align: left">
+
+                    <% if (launches.length) { for (var i = 0; i < launches.length; i++) { %>
                     <li><%= launches[i].name %></li>
+                    <% } } else { %>
+                    <li>No launches coming up</li>
                     <% } %>
 
                 </ul>
