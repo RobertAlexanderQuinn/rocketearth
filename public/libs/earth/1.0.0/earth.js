@@ -87,6 +87,7 @@
 
   var configuration = µ.buildConfiguration(globes, products.overlayTypes); // holds the page's current configuration settings
   var inputController = buildInputController(); // interprets drag/zoom operations
+  var filterController = buildFilterController();
   var meshAgent = newAgent(); // map data for the earth
   var globeAgent = newAgent(); // the model of the globe
   var gridAgent = newAgent(); // the grid of weather data
@@ -210,6 +211,36 @@
       }
     });
 
+    function reorient() {
+      var options = arguments[3] || {};
+      if (!globe || options.source === 'moveEnd') {
+        // reorientation occurred because the user just finished a move operation, so globe is already
+        // oriented correctly.
+        return;
+      }
+      dispatch.trigger('moveStart');
+      globe.orientation(configuration.get('orientation'), view);
+      zoom.scale(globe.projection.scale());
+      dispatch.trigger('moveEnd');
+    }
+
+    var dispatch = _.extend(
+      {
+        globe: function(_) {
+          if (_) {
+            globe = _;
+            zoom.scaleExtent(globe.scaleExtent());
+            reorient();
+          }
+          return _ ? this : globe;
+        }
+      },
+      Backbone.Events
+    );
+    return dispatch.listenTo(configuration, 'change:orientation', reorient);
+  }
+
+  function buildFilterController() {
     const scrubber = d3.select('#scrubber');
     const scrubberPadding = 80;
     const dateScale = d3.time
@@ -283,14 +314,16 @@
         d3.transform(maxHandle.attr('transform')).translate[0] - 20
       );
       const t = d3.transform(handle.attr('transform'));
+      const date = dateScale.invert(pos);
       handle.attr('transform', translate(pos, t.translate[1]));
-      minText.text(dateScale.invert(pos).toDateString());
+      handle.data([date]);
+      minText.text(date.toDateString());
 
       // stop drag events from leaking to globe
       d3.event.sourceEvent.stopImmediatePropagation();
       dispatch.trigger('range:change', {
-        min: minText.text(),
-        max: maxText.text()
+        min: minHandle.data[0],
+        max: maxHandle.data[0]
       });
     });
     minHandle.call(minDrag);
@@ -333,30 +366,19 @@
         view.width - scrubberPadding
       );
       const t = d3.transform(handle.attr('transform'));
+      const date = dateScale.invert(pos);
       handle.attr('transform', translate(pos, t.translate[1]));
-      maxText.text(dateScale.invert(pos).toDateString());
+      handle.data([date]);
+      maxText.text(date.toDateString());
 
       // stop drag events from leaking to globe
       d3.event.sourceEvent.stopImmediatePropagation();
       dispatch.trigger('range:change', {
-        min: minText.text(),
-        max: maxText.text()
+        min: minHandle.data[0],
+        max: maxHandle.data[0]
       });
     });
     maxHandle.call(maxDrag);
-
-    function reorient() {
-      var options = arguments[3] || {};
-      if (!globe || options.source === 'moveEnd') {
-        // reorientation occurred because the user just finished a move operation, so globe is already
-        // oriented correctly.
-        return;
-      }
-      dispatch.trigger('moveStart');
-      globe.orientation(configuration.get('orientation'), view);
-      zoom.scale(globe.projection.scale());
-      dispatch.trigger('moveEnd');
-    }
 
     var dispatch = _.extend(
       {
@@ -371,7 +393,6 @@
       },
       Backbone.Events
     );
-    return dispatch.listenTo(configuration, 'change:orientation', reorient);
   }
 
   /**
@@ -495,7 +516,6 @@
     d3.selectAll('path').attr('d', path); // do an initial draw -- fixes issue with safari
 
     function drawLaunchpad(coord, props) {
-      //var mark = d3.select('.pad-mark');
       var mark = d3
         .select('#foreground')
         .append('path')
@@ -574,8 +594,6 @@
         var mark = drawLaunchpad([pad.longitude, pad.latitude], pad);
 
         mark.on('click', () => {
-          console.log('click ' + pad.id);
-
           // unmark last pad (if any)
           d3.select('.pad-mark-selected').classed('pad-mark-selected', false);
 
@@ -595,11 +613,6 @@
         });
       });
     });
-
-    // Draw the location mark if one is currently visible.
-    if (activeLocation.point && activeLocation.coord) {
-      drawLocationMark(activeLocation.point, activeLocation.coord);
-    }
 
     // Throttled draw method helps with slow devices that would get overwhelmed by too many redraw events.
     var REDRAW_WAIT = 5; // milliseconds
@@ -631,7 +644,6 @@
         d3.selectAll('path').attr('d', path);
         rendererAgent.trigger('render');
       }
-      //click: drawLocationMark
     });
 
     // Finally, inject the globe model into the input controller. Do it on the next event turn to ensure
