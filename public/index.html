@@ -9,16 +9,13 @@
     <meta property="og:type"        content="website"/>
     <meta property="og:title"       content="rocketearth"/>
     <meta property="og:description" content="An animated map of past and present rocket launches."/>
-    <meta property="og:url"         content="http://earth.nullschool.net"/>
-    <meta property="og:image"       content="http://earth.nullschool.net/preview.jpg"/>
+    <meta property="og:url"         content="https://rocketearth.app"/>    
 
     <link rel="shortcut icon" href="/favicon.ico"/>
     <link rel="apple-touch-icon" sizes="120x120" href="/iphone-icon.png"/>
     <link rel="apple-touch-icon" sizes="152x152" href="/ipad-icon.png"/>
     <link rel="stylesheet" type="text/css" href="/styles/styles.css"/>
-
-    <link rel="alternate" hreflang="x-default" href="http://earth.nullschool.net/"/>
-    <link rel="alternate" hreflang="ja" href="http://earth.nullschool.net/jp/"/>
+    <link rel="alternate" hreflang="x-default" href="https://rocketearth.app/"/>
 </head>
 <body data-lang="en">
 <div id="container">
@@ -56,6 +53,7 @@
             <span id="show-menu" class="text-button" title="menu">rocketearth</span>
             <span id="progress" class="invisible"></span>
         </p>
+        <!-- actually for pad data -->
         <script type="text/template" id="launch-template">
             <div>
                 <p><%= name %></p>
@@ -63,9 +61,19 @@
                 <p>(launch info)</p>
             </div>
         </script>
-        <script type="text/template" id="spaceport-list">
+        <script type="text/template" id="mission-list">
+            TODO
         </script>
-        <script type="text/template" id="spaceport-item">
+        <script type="text/template" id="mission-item">
+            <div>
+                <p><%= mission_name %></p>
+                <p><%= mission_description %></p>
+                <p><%= agency_0_name %></p>
+                <p>more info...<p>
+                <ul>                    
+                    <%= agency_0_infoURLs... %>
+                <ul>
+            </div>
         </script>
         <div id="launch-info" class="">
             <p>No Data</p>
