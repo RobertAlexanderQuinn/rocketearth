@@ -198,6 +198,119 @@
       }
     });
 
+    const scrubber = d3.select('#scrubber');
+    const scrubberPadding = 80;
+    const dateScale = d3.time
+      .scale()
+      .domain([new Date('1971-01-01'), new Date('2018-01-01')])
+      .range([scrubberPadding, view.width - scrubberPadding]);
+
+    // Scrub bottom bar
+    scrubber
+      .append('rect')
+      .attr('fill', 'white')
+      .attr('width', view.width - scrubberPadding * 2)
+      .attr('height', 2)
+      .attr('x', scrubberPadding)
+      .attr('y', view.height - scrubberPadding / 2);
+
+    // Min End
+    scrubber
+      .append('rect')
+      .attr('fill', 'white')
+      .attr('width', 2)
+      .attr('height', 20)
+      .attr('x', scrubberPadding)
+      .attr('y', view.height - scrubberPadding / 2);
+
+    // Max End
+    scrubber
+      .append('rect')
+      .attr('fill', 'white')
+      .attr('width', 2)
+      .attr('height', 20)
+      .attr('x', view.width - scrubberPadding)
+      .attr('y', view.height - scrubberPadding / 2);
+    function translate(x, y) {
+      return `translate(${x}, ${y})`;
+    }
+
+    const minHandle = scrubber
+      .append('g')
+      .attr(
+        'transform',
+        translate(scrubberPadding, view.height - scrubberPadding + 14)
+      );
+    minHandle
+      .append('rect')
+      .attr('fill', '#00ff00')
+      .attr('width', 2)
+      .attr('height', 30);
+    minHandle
+      .append('circle')
+      .attr('r', 6)
+      .attr('cx', 1)
+      .attr('cy', 28)
+      .attr('fill', '#00ff00');
+    const minText = minHandle
+      .append('text')
+      .text('1961')
+      .attr('font-size', '20px')
+      .attr('fill', 'white')
+      .attr('text-anchor', 'end');
+    const minDrag = d3.behavior.drag().on('drag', function(d) {
+      const handle = d3.select(this);
+      const pos = µ.clamp(
+        d3.event.x,
+        scrubberPadding,
+        d3.transform(maxHandle.attr('transform')).translate[0] - 20
+      );
+      const t = d3.transform(handle.attr('transform'));
+      handle.attr('transform', translate(pos, t.translate[1]));
+      minText.text(dateScale.invert(pos).toDateString());
+    });
+    minHandle.call(minDrag);
+
+    const maxHandle = scrubber
+      .append('g')
+      .attr(
+        'transform',
+        translate(
+          view.width - scrubberPadding,
+          view.height - scrubberPadding + 14
+        )
+      );
+    maxHandle
+      .append('rect')
+      .attr('width', 2)
+      .attr('height', 30)
+      .attr('fill', '#00ff00');
+    maxHandle
+      .append('circle')
+      .attr('r', 6)
+      .attr('cx', 1)
+      .attr('cy', 28)
+      .attr('fill', '#00ff00');
+    const maxText = maxHandle
+      .append('text')
+      .text('2018')
+      .attr('font-size', '20px')
+      .attr('fill', 'white')
+      .attr('x', 8);
+
+    const maxDrag = d3.behavior.drag().on('drag', function(d) {
+      const handle = d3.select(this);
+      const pos = µ.clamp(
+        d3.event.x,
+        d3.transform(minHandle.attr('transform')).translate[0] + 20,
+        view.width - scrubberPadding
+      );
+      const t = d3.transform(handle.attr('transform'));
+      handle.attr('transform', translate(pos, t.translate[1]));
+      maxText.text(dateScale.invert(pos).toDateString());
+    });
+    maxHandle.call(maxDrag);
+
     function reorient() {
       var options = arguments[3] || {};
       if (!globe || options.source === 'moveEnd') {
