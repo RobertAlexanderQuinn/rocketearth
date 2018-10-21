@@ -9,7 +9,7 @@
     <meta property="og:type"        content="website"/>
     <meta property="og:title"       content="rocketearth"/>
     <meta property="og:description" content="An animated map of past and present rocket launches."/>
-    <meta property="og:url"         content="https://rocketearth.app"/>    
+    <meta property="og:url"         content="https://rocketearth.app"/>
 
     <link rel="shortcut icon" href="/favicon/favicon.ico"/>
     <link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon.png"/>
@@ -49,16 +49,20 @@
                 <span id="location-value-units" class="text-button"></span>
             </p>
         </div>
-        <p id="earth">
-            <span id="show-menu" class="text-button" title="menu">rocketearth</span>
-            <span id="progress" class="invisible"></span>
-        </p>
         <!-- actually for pad data -->
         <script type="text/template" id="launch-template">
             <div>
                 <p><%= name %></p>
                 <p><%= agency %></p>
-                <p>(launch info)</p>
+                <ul style="text-align: left">
+
+                    <% if (launches.length) { for (var i = 0; i < launches.length; i++) { %>
+                    <li><%= launches[i].name %></li>
+                    <% } } else { %>
+                    <li>No launches coming up</li>
+                    <% } %>
+
+                </ul>
             </div>
         </script>
         <script type="text/template" id="mission-list">
@@ -70,7 +74,7 @@
                 <p><%= mission_description %></p>
                 <p><%= agency_0_name %></p>
                 <p>more info...<p>
-                <ul>                    
+                <ul>
                     <%= agency_0_infoURLs... %>
                 <ul>
             </div>
