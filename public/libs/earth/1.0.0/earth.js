@@ -380,19 +380,8 @@
     });
     maxHandle.call(maxDrag);
 
-    var dispatch = _.extend(
-      {
-        globe: function(_) {
-          if (_) {
-            globe = _;
-            zoom.scaleExtent(globe.scaleExtent());
-            reorient();
-          }
-          return _ ? this : globe;
-        }
-      },
-      Backbone.Events
-    );
+    var dispatch = _.extend({}, Backbone.Events);
+    return dispatch;
   }
 
   /**
@@ -579,37 +568,31 @@
       agency: 'agency'
     });
 
-    console.log(selectedPad);
-
     // initialize?
     var app = new SelectedPadView({
       model: selectedPad
     });
 
     // read data from all sites and plot pads
-    µ.loadJson('/site').then(data => {
-      console.log('plotting pads');
+    window.data.sites.pads.forEach(pad => {
+      var mark = drawLaunchpad([pad.longitude, pad.latitude], pad);
 
-      data.pads.forEach(pad => {
-        var mark = drawLaunchpad([pad.longitude, pad.latitude], pad);
+      mark.on('click', () => {
+        // unmark last pad (if any)
+        d3.select('.pad-mark-selected').classed('pad-mark-selected', false);
 
-        mark.on('click', () => {
-          // unmark last pad (if any)
-          d3.select('.pad-mark-selected').classed('pad-mark-selected', false);
+        // mark this pad
+        mark.classed('pad-mark-selected', true);
 
-          // mark this pad
-          mark.classed('pad-mark-selected', true);
+        //d3.select("#launch-info").classed("invisible". false);
 
-          //d3.select("#launch-info").classed("invisible". false);
-
-          var agency = 'no agency';
-          if (pad.agencies && pad.agencies.length > 0) {
-            agency = pad.agencies[0].name;
-          }
-          selectedPad.set({
-            name: pad.name,
-            agency: agency
-          });
+        var agency = 'no agency';
+        if (pad.agencies && pad.agencies.length > 0) {
+          agency = pad.agencies[0].name;
+        }
+        selectedPad.set({
+          name: pad.name,
+          agency: agency
         });
       });
     });
@@ -627,6 +610,10 @@
         leading: false
       });
     }
+
+    dispatch.listenTo(filterController, {
+      'range:change': function() {}
+    });
 
     // Attach to map rendering events on input controller.
     dispatch.listenTo(inputController, {
@@ -1219,10 +1206,6 @@
       }
     });
 
-    // d3.select('.pad-mark').on('click', function() {
-    //   console.log("pad click");
-    // });
-
     if (µ.isFF()) {
       // Workaround FF performance issue of slow click behavior on map having thick coastlines.
       d3.select('#display').classed('firefox', true);
@@ -1551,6 +1534,12 @@
   }
 
   when(true)
+    .then(() => {
+      return µ.loadJson('/data').then(data => {
+        console.log('data loaded');
+        window.data = data;
+      });
+    })
     .then(init)
     .then(start)
     .otherwise(report.error);
