@@ -9,7 +9,7 @@
 
 // import "d3";
 
-(function() {
+(function () {
   'use strict';
 
   var SECOND = 1000;
@@ -40,15 +40,15 @@
   /**
    * An object to display various types of messages to the user.
    */
-  var report = (function() {
+  var report = (function () {
     var s = d3.select('#status'),
       p = d3.select('#progress'),
       total = REMAINING.length;
     return {
-      status: function(msg) {
+      status: function (msg) {
         return s.classed('bad') ? s : s.text(msg); // errors are sticky until reset
       },
-      error: function(err) {
+      error: function (err) {
         var msg = err.status ? err.status + ' ' + err.message : err;
         switch (err.status) {
           case -1:
@@ -61,10 +61,10 @@
         log.error(err);
         return s.classed('bad', true).text(msg);
       },
-      reset: function() {
+      reset: function () {
         return s.classed('bad', false).text('');
       },
-      progress: function(amount) {
+      progress: function (amount) {
         // amount of progress to report in the range [0, 1]
         if (0 <= amount && amount < 1) {
           var i = Math.ceil(amount * total);
@@ -77,7 +77,10 @@
   })();
 
   function newAgent() {
-    return µ.newAgent().on({ reject: report.error, fail: report.error });
+    return µ.newAgent().on({
+      reject: report.error,
+      fail: report.error
+    });
   }
 
   // Construct the page's main internal components:
@@ -132,10 +135,10 @@
 
     var zoom = d3.behavior
       .zoom()
-      .on('zoomstart', function() {
+      .on('zoomstart', function () {
         op = op || newOp(d3.mouse(this), zoom.scale()); // a new operation begins
       })
-      .on('zoom', function() {
+      .on('zoom', function () {
         var currentMouse = d3.mouse(this),
           currentScale = d3.event.scale;
         op = op || newOp(currentMouse, 1); // Fix bug on some browsers where zoomstart fires out of order.
@@ -160,7 +163,7 @@
         );
         dispatch.trigger('move');
       })
-      .on('zoomend', function() {
+      .on('zoomend', function () {
         op.manipulator.end();
         if (op.type === 'click') {
           dispatch.trigger(
@@ -174,145 +177,164 @@
         op = null; // the drag/zoom/click operation is over
       });
 
-    var signalEnd = _.debounce(function() {
+    var signalEnd = _.debounce(function () {
       if (!op || (op.type !== 'drag' && op.type !== 'zoom')) {
-        configuration.save(
-          { orientation: globe.orientation() },
-          { source: 'moveEnd' }
-        );
+        configuration.save({
+          orientation: globe.orientation()
+        }, {
+          source: 'moveEnd'
+        });
         dispatch.trigger('moveEnd');
       }
     }, MOVE_END_WAIT); // wait for a bit to decide if user has stopped moving the globe
 
     d3.select('#display').call(zoom);
-    d3.select('#show-location').on('click', function() {
+    d3.select('#show-location').on('click', function () {
       if (navigator.geolocation) {
         report.status('Finding current position...');
-        navigator.geolocation.getCurrentPosition(function(pos) {
+        navigator.geolocation.getCurrentPosition(function (pos) {
           report.status('');
           var coord = [pos.coords.longitude, pos.coords.latitude],
             rotate = globe.locate(coord);
           if (rotate) {
             globe.projection.rotate(rotate);
-            configuration.save({ orientation: globe.orientation() }); // triggers reorientation
+            configuration.save({
+              orientation: globe.orientation()
+            }); // triggers reorientation
           }
           dispatch.trigger('click', globe.projection(coord), coord);
         }, log.error);
       }
     });
 
-    const scrubber = d3.select('#scrubber');
-    const scrubberPadding = 80;
-    const dateScale = d3.time
-      .scale()
-      .domain([new Date('1971-01-01'), new Date('2018-01-01')])
-      .range([scrubberPadding, view.width - scrubberPadding]);
+    //if (false) {
+      const scrubber = d3.select('#scrubber');
+      const scrubberPadding = 80;
+      const dateScale = d3.time
+        .scale()
+        .domain([new Date('1971-01-01'), new Date('2018-01-01')])
+        .range([scrubberPadding, view.width - scrubberPadding]);
 
-    // Scrub bottom bar
-    scrubber
-      .append('rect')
-      .attr('fill', 'white')
-      .attr('width', view.width - scrubberPadding * 2)
-      .attr('height', 2)
-      .attr('x', scrubberPadding)
-      .attr('y', view.height - scrubberPadding / 2);
+      // Scrub bottom bar
+      scrubber
+        .append('rect')
+        .attr('fill', 'white')
+        .attr('width', view.width - scrubberPadding * 2)
+        .attr('height', 2)
+        .attr('x', scrubberPadding)
+        .attr('y', view.height - scrubberPadding / 2);
 
-    // Min End
-    scrubber
-      .append('rect')
-      .attr('fill', 'white')
-      .attr('width', 2)
-      .attr('height', 20)
-      .attr('x', scrubberPadding)
-      .attr('y', view.height - scrubberPadding / 2);
+      // Min End
+      scrubber
+        .append('rect')
+        .attr('fill', 'white')
+        .attr('width', 2)
+        .attr('height', 20)
+        .attr('x', scrubberPadding)
+        .attr('y', view.height - scrubberPadding / 2);
 
-    // Max End
-    scrubber
-      .append('rect')
-      .attr('fill', 'white')
-      .attr('width', 2)
-      .attr('height', 20)
-      .attr('x', view.width - scrubberPadding)
-      .attr('y', view.height - scrubberPadding / 2);
-    function translate(x, y) {
-      return `translate(${x}, ${y})`;
-    }
+      // Max End
+      scrubber
+        .append('rect')
+        .attr('fill', 'white')
+        .attr('width', 2)
+        .attr('height', 20)
+        .attr('x', view.width - scrubberPadding)
+        .attr('y', view.height - scrubberPadding / 2);
 
-    const minHandle = scrubber
-      .append('g')
-      .attr(
-        'transform',
-        translate(scrubberPadding, view.height - scrubberPadding + 14)
-      );
-    minHandle
-      .append('rect')
-      .attr('fill', '#00ff00')
-      .attr('width', 2)
-      .attr('height', 30);
-    minHandle
-      .append('circle')
-      .attr('r', 6)
-      .attr('cx', 1)
-      .attr('cy', 28)
-      .attr('fill', '#00ff00');
-    const minText = minHandle
-      .append('text')
-      .text('1961')
-      .attr('font-size', '20px')
-      .attr('fill', 'white')
-      .attr('text-anchor', 'end');
-    const minDrag = d3.behavior.drag().on('drag', function(d) {
-      const handle = d3.select(this);
-      const pos = µ.clamp(
-        d3.event.x,
-        scrubberPadding,
-        d3.transform(maxHandle.attr('transform')).translate[0] - 20
-      );
-      const t = d3.transform(handle.attr('transform'));
-      handle.attr('transform', translate(pos, t.translate[1]));
-      minText.text(dateScale.invert(pos).toDateString());
-    });
-    minHandle.call(minDrag);
+      function translate(x, y) {
+        return `translate(${x}, ${y})`;
+      }
 
-    const maxHandle = scrubber
-      .append('g')
-      .attr(
-        'transform',
-        translate(
-          view.width - scrubberPadding,
-          view.height - scrubberPadding + 14
-        )
-      );
-    maxHandle
-      .append('rect')
-      .attr('width', 2)
-      .attr('height', 30)
-      .attr('fill', '#00ff00');
-    maxHandle
-      .append('circle')
-      .attr('r', 6)
-      .attr('cx', 1)
-      .attr('cy', 28)
-      .attr('fill', '#00ff00');
-    const maxText = maxHandle
-      .append('text')
-      .text('2018')
-      .attr('font-size', '20px')
-      .attr('fill', 'white')
-      .attr('x', 8);
+      const minHandle = scrubber
+        .append('g')
+        .attr(
+          'transform',
+          translate(scrubberPadding, view.height - scrubberPadding + 14)
+        );
+      minHandle
+        .append('rect')
+        .attr('fill', '#00ff00')
+        .attr('width', 2)
+        .attr('height', 30);
+      minHandle
+        .append('circle')
+        .attr('r', 6)
+        .attr('cx', 1)
+        .attr('cy', 28)
+        .attr('fill', '#00ff00');
 
-    const maxDrag = d3.behavior.drag().on('drag', function(d) {
-      const handle = d3.select(this);
-      const pos = µ.clamp(
-        d3.event.x,
-        d3.transform(minHandle.attr('transform')).translate[0] + 20,
-        view.width - scrubberPadding
-      );
-      const t = d3.transform(handle.attr('transform'));
-      handle.attr('transform', translate(pos, t.translate[1]));
-      maxText.text(dateScale.invert(pos).toDateString());
-    });
-    maxHandle.call(maxDrag);
+      // pick up custom class for pointer events
+      minHandle.attr("id","minRange");
+
+      const minText = minHandle
+        .append('text')
+        .text('1961')
+        .attr('font-size', '20px')
+        .attr('fill', 'white')
+        .attr('text-anchor', 'end');
+      const minDrag = d3.behavior.drag().on('drag', function (d) {
+        const handle = d3.select(this);
+        const pos = µ.clamp(
+          d3.event.x,
+          scrubberPadding,
+          d3.transform(maxHandle.attr('transform')).translate[0] - 20
+        );
+        const t = d3.transform(handle.attr('transform'));
+        handle.attr('transform', translate(pos, t.translate[1]));
+        minText.text(dateScale.invert(pos).toDateString());
+
+        // stop drag events from leaking to globe
+        d3.event.sourceEvent.stopImmediatePropagation();
+      });
+      minHandle.call(minDrag);
+
+      const maxHandle = scrubber
+        .append('g')
+        .attr(
+          'transform',
+          translate(
+            view.width - scrubberPadding,
+            view.height - scrubberPadding + 14
+          )
+        );
+      maxHandle
+        .append('rect')
+        .attr('width', 2)
+        .attr('height', 30)
+        .attr('fill', '#00ff00');
+      maxHandle
+        .append('circle')
+        .attr('r', 6)
+        .attr('cx', 1)
+        .attr('cy', 28)
+        .attr('fill', '#00ff00');
+      const maxText = maxHandle
+        .append('text')
+        .text('2018')
+        .attr('font-size', '20px')
+        .attr('fill', 'white')
+        .attr('x', 8);
+
+      // pick up mouse events from targetted class
+      maxHandle.attr("id", "maxRange");
+
+      const maxDrag = d3.behavior.drag().on('drag', function (d) {        
+        const handle = d3.select(this);
+        const pos = µ.clamp(
+          d3.event.x,
+          d3.transform(minHandle.attr('transform')).translate[0] + 20,
+          view.width - scrubberPadding
+        );
+        const t = d3.transform(handle.attr('transform'));
+        handle.attr('transform', translate(pos, t.translate[1]));
+        maxText.text(dateScale.invert(pos).toDateString());
+
+        // stop drag events from leaking to globe
+        d3.event.sourceEvent.stopImmediatePropagation();
+      });
+      maxHandle.call(maxDrag);
+    //}
 
     function reorient() {
       var options = arguments[3] || {};
@@ -327,9 +349,8 @@
       dispatch.trigger('moveEnd');
     }
 
-    var dispatch = _.extend(
-      {
-        globe: function(_) {
+    var dispatch = _.extend({
+        globe: function (_) {
           if (_) {
             globe = _;
             zoom.scaleExtent(globe.scaleExtent());
@@ -350,7 +371,7 @@
   function buildMesh(resource) {
     var cancel = this.cancel;
     report.status('Downloading...');
-    return µ.loadJson(resource).then(function(topo) {
+    return µ.loadJson(resource).then(function (topo) {
       if (cancel.requested) return null;
       log.time('building meshes');
       var o = topo.objects;
@@ -404,20 +425,20 @@
     downloadsInProgress++;
     var loaded = when.map(
       products.productsFor(configuration.attributes),
-      function(product) {
+      function (product) {
         return product.load(cancel);
       }
     );
     return when
       .all(loaded)
-      .then(function(products) {
+      .then(function (products) {
         log.time('build grids');
         return {
           primaryGrid: products[0],
           overlayGrid: products[1] || products[0]
         };
       })
-      .ensure(function() {
+      .ensure(function () {
         downloadsInProgress--;
       });
   }
@@ -481,7 +502,10 @@
             .append('path')
             .attr('class', 'location-mark');
         }
-        mark.datum({ type: 'Point', coordinates: coord }).attr('d', path);
+        mark.datum({
+          type: 'Point',
+          coordinates: coord
+        }).attr('d', path);
       }
     }
 
@@ -492,28 +516,97 @@
         .append('path')
         .attr('class', 'pad-mark')
         .attr('id', "pad" + props.id);
-      mark.datum({ type: 'Point', coordinates: coord, props: props }).attr('d', path);
-      
+
+      mark.datum({
+        type: 'Point',
+        coordinates: coord,
+        props: props
+      }).attr('d', path);
+
       return mark;
     }
 
-    var lastMark = null;
+      // oisin
+
+  // fix up missing jquery
+  Backbone.$ = d3.select;
+
+  // Model
+  const PadModel = Backbone.Model.extend({
+    defaults: {
+      name: 'empty',
+      agency: 'unknown'
+    }
+  });
+
+  // View
+  const SelectedPadView = Backbone.View.extend({
+    // bound element
+    el: "#launch-info",
+
+    // precompile template
+    template: _.template(d3.select("#launch-template").html()),
+
+    initialize: function () {
+            
+      console.log("SelectedPadView.initialize");
+      this.model.on("change", this.render, this); // 3rd arg is bind context (this)
+    },
+
+    render: function () {
+      console.log("SelectedPadView.render");
+
+      // apply model attributes to template
+      this.$el.html(this.template(this.model.attributes));
+
+      // allow fluent invocation
+      return this;
+    },
+
+    update: function () {
+      console.log("SelectedPadView.update");
+    }
+  });
+
+  let selectedPad = new PadModel({
+    name: "padname",
+    agency: "agency"
+  });
+
+  console.log(selectedPad);
+  
+  // initialize?
+  var app = new SelectedPadView({
+    model: selectedPad
+  });
 
     // read data from all sites and plot pads
     µ.loadJson('/site').then(data => {
-      
+
       console.log("plotting pads");
 
       data.pads.forEach(pad => {
         var mark = drawLaunchpad([pad.longitude, pad.latitude], pad);
+
         mark.on("click", () => {
           console.log("click " + pad.id);
-          
+
           // unmark last pad (if any)
           d3.select(".pad-mark-selected").classed("pad-mark-selected", false);
 
           // mark this pad
           mark.classed("pad-mark-selected", true);
+
+          //d3.select("#launch-info").classed("invisible". false);
+
+          var agency = "no agency";
+          if (pad.agencies && (pad.agencies.length > 0)) {
+            agency = pad.agencies[0].name;
+          }
+          selectedPad.set({
+            name: pad.name,
+            agency: agency
+          });
         });
       });
     });
@@ -525,36 +618,40 @@
 
     // Throttled draw method helps with slow devices that would get overwhelmed by too many redraw events.
     var REDRAW_WAIT = 5; // milliseconds
-    var doDraw_throttled = _.throttle(doDraw, REDRAW_WAIT, { leading: false });
+    var doDraw_throttled = _.throttle(doDraw, REDRAW_WAIT, {
+      leading: false
+    });
 
     function doDraw() {
       d3.selectAll('path').attr('d', path);
       rendererAgent.trigger('redraw');
-      doDraw_throttled = _.throttle(doDraw, REDRAW_WAIT, { leading: false });
+      doDraw_throttled = _.throttle(doDraw, REDRAW_WAIT, {
+        leading: false
+      });
     }
 
     // Attach to map rendering events on input controller.
     dispatch.listenTo(inputController, {
-      moveStart: function() {
+      moveStart: function () {
         coastline.datum(mesh.coastLo);
         lakes.datum(mesh.lakesLo);
         rendererAgent.trigger('start');
       },
-      move: function() {
+      move: function () {
         doDraw_throttled();
       },
-      moveEnd: function() {
+      moveEnd: function () {
         coastline.datum(mesh.coastHi);
         lakes.datum(mesh.lakesHi);
         d3.selectAll('path').attr('d', path);
         rendererAgent.trigger('render');
-      },      
+      },
       //click: drawLocationMark
     });
 
     // Finally, inject the globe model into the input controller. Do it on the next event turn to ensure
     // renderer is fully set up before events start flowing.
-    when(true).then(function() {
+    when(true).then(function () {
       inputController.globe(globe);
     });
 
@@ -585,11 +682,11 @@
     log.timeEnd('render mask');
     return {
       imageData: imageData,
-      isVisible: function(x, y) {
+      isVisible: function (x, y) {
         var i = (y * width + x) * 4;
         return data[i + 3] > 0; // non-zero alpha means pixel is visible
       },
-      set: function(x, y, rgba) {
+      set: function (x, y, rgba) {
         var i = (y * width + x) * 4;
         data[i] = rgba[0];
         data[i + 1] = rgba[1];
@@ -613,7 +710,7 @@
     /**
      * @returns {boolean} true if the field is valid at the point (x, y)
      */
-    field.isDefined = function(x, y) {
+    field.isDefined = function (x, y) {
       return field(x, y)[2] !== null;
     };
 
@@ -622,17 +719,17 @@
      *          the vector field has a hole (is undefined) at that point, such as at an island in a field of
      *          ocean currents.
      */
-    field.isInsideBoundary = function(x, y) {
+    field.isInsideBoundary = function (x, y) {
       return field(x, y) !== NULL_WIND_VECTOR;
     };
 
     // Frees the massive "columns" array for GC. Without this, the array is leaked (in Chrome) each time a new
     // field is interpolated because the field closure's context is leaked, for reasons that defy explanation.
-    field.release = function() {
+    field.release = function () {
       columns = [];
     };
 
-    field.randomize = function(o) {
+    field.randomize = function (o) {
       // UNDONE: this method is terrible
       var x, y;
       var safetyNet = 0;
@@ -765,28 +862,30 @@
       INTENSITY_SCALE_STEP,
       grids.primaryGrid.particles.maxIntensity
     );
-    var buckets = colorStyles.map(function() {
+    var buckets = colorStyles.map(function () {
       return [];
     });
     var particleCount = Math.round(bounds.width * PARTICLE_MULTIPLIER);
     if (µ.isMobile()) {
       particleCount *= PARTICLE_REDUCTION;
     }
-    var fadeFillStyle = µ.isFF()
-      ? 'rgba(0, 0, 0, 0.95)'
-      : 'rgba(0, 0, 0, 0.97)'; // FF Mac alpha behaves oddly
+    var fadeFillStyle = µ.isFF() ?
+      'rgba(0, 0, 0, 0.95)' :
+      'rgba(0, 0, 0, 0.97)'; // FF Mac alpha behaves oddly
 
     log.debug('particle count: ' + particleCount);
     var particles = [];
     for (var i = 0; i < particleCount; i++) {
-      particles.push(field.randomize({ age: _.random(0, MAX_PARTICLE_AGE) }));
+      particles.push(field.randomize({
+        age: _.random(0, MAX_PARTICLE_AGE)
+      }));
     }
 
     function evolve() {
-      buckets.forEach(function(bucket) {
+      buckets.forEach(function (bucket) {
         bucket.length = 0;
       });
-      particles.forEach(function(particle) {
+      particles.forEach(function (particle) {
         if (particle.age > MAX_PARTICLE_AGE) {
           field.randomize(particle).age = 0;
         }
@@ -829,11 +928,11 @@
       g.globalCompositeOperation = prev;
 
       // Draw new particle trails.
-      buckets.forEach(function(bucket, i) {
+      buckets.forEach(function (bucket, i) {
         if (bucket.length > 0) {
           g.beginPath();
           g.strokeStyle = colorStyles[i];
-          bucket.forEach(function(particle) {
+          bucket.forEach(function (particle) {
             g.moveTo(particle.x, particle.y);
             g.lineTo(particle.xt, particle.yt);
             particle.x = particle.xt;
@@ -865,11 +964,11 @@
     ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     // Use the clipping behavior of a projection stream to quickly draw visible points.
     var stream = globe.projection.stream({
-      point: function(x, y) {
+      point: function (x, y) {
         ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
       }
     });
-    grid.forEachPoint(function(λ, φ, d) {
+    grid.forEachPoint(function (λ, φ, d) {
       if (µ.isValue(d)) {
         stream.point(λ, φ);
       }
@@ -880,9 +979,9 @@
     if (!field) return;
 
     var ctx = d3
-        .select('#overlay')
-        .node()
-        .getContext('2d'),
+      .select('#overlay')
+      .node()
+      .getContext('2d'),
       grid = (gridAgent.value() || {}).overlayGrid;
 
     µ.clearCanvas(d3.select('#overlay').node());
@@ -903,16 +1002,16 @@
     // When the active layer is considered "current", use its time as now, otherwise use current time as
     // now (but rounded down to the nearest three-hour block).
     var THREE_HOURS = 3 * HOUR;
-    var now = grids
-      ? grids.primaryGrid.date.getTime()
-      : Math.floor(Date.now() / THREE_HOURS) * THREE_HOURS;
+    var now = grids ?
+      grids.primaryGrid.date.getTime() :
+      Math.floor(Date.now() / THREE_HOURS) * THREE_HOURS;
     var parts = configuration.get('date').split('/'); // yyyy/mm/dd or "current"
     var hhmm = configuration.get('hour');
-    return parts.length > 1
-      ? Date.UTC(+parts[0], parts[1] - 1, +parts[2], +hhmm.substring(0, 2))
-      : parts[0] === 'current'
-        ? now
-        : null;
+    return parts.length > 1 ?
+      Date.UTC(+parts[0], parts[1] - 1, +parts[2], +hhmm.substring(0, 2)) :
+      parts[0] === 'current' ?
+      now :
+      null;
   }
 
   /**
@@ -962,10 +1061,10 @@
       size = units.length;
     var index = +(d3.select(id).attr('data-index') || 0) % size;
     return {
-      value: function() {
+      value: function () {
         return units[index];
       },
-      next: function() {
+      next: function () {
         d3.select(id).attr('data-index', (index = (index + 1) % size));
       }
     };
@@ -980,7 +1079,7 @@
     d3.select('#location-wind').text(µ.formatVector(wind, units));
     d3.select('#location-wind-units')
       .text(units.label)
-      .on('click', function() {
+      .on('click', function () {
         unitToggle.next();
         showWindAtLocation(wind, product);
       });
@@ -995,7 +1094,7 @@
     d3.select('#location-value').text(µ.formatScalar(value, units));
     d3.select('#location-value-units')
       .text(units.label)
-      .on('click', function() {
+      .on('click', function () {
         unitToggle.next();
         showOverlayValueAtLocation(value, product);
       });
@@ -1022,7 +1121,10 @@
     }
 
     clearLocationDetails(false); // clean the slate
-    activeLocation = { point: point, coord: coord }; // remember where the current location is
+    activeLocation = {
+      point: point,
+      coord: coord
+    }; // remember where the current location is
 
     if (_.isFinite(λ) && _.isFinite(φ)) {
       d3.select('#location-coord').text(µ.formatCoordinates(λ, φ));
@@ -1078,11 +1180,11 @@
    */
   function bindButtonToConfiguration(elementId, newAttr, keys) {
     keys = keys || _.keys(newAttr);
-    d3.select(elementId).on('click', function() {
+    d3.select(elementId).on('click', function () {
       if (d3.select(elementId).classed('disabled')) return;
       configuration.save(newAttr);
     });
-    configuration.on('change', function(model) {
+    configuration.on('change', function (model) {
       var attr = model.attributes;
       d3.select(elementId).classed(
         'highlighted',
@@ -1090,53 +1192,6 @@
       );
     });
   }
-
-  // oisin
-
-  // fix up missing jquery
-  Backbone.$ = d3.select;
-
-  // Model
-  const PadModel = Backbone.Model.extend({
-    defaults: {
-      name: 'empty'
-    }
-  });
-
-  // View
-  let SelectedPadView = Backbone.View.extend({
-    // bound element
-    el: "#launch-info",
-
-    // precompile template
-    template: _.template(d3.select("#launch-template").html()),
-
-    initialize: function() {
-      console.log("SelectedPadView.initialize");
-      this.render();
-    },
-
-    render: function() {
-      console.log("SelectedPadView.render");
-
-      // apply model attributes to template
-      this.$el.html(this.template(this.model.attributes));
-
-      // allow fluent invocation
-      return this;
-    },
-
-    update: function() {
-      console.log("SelectedPadView.update");
-    }
-  });
-
-  let selectedPad = new PadModel({
-    name: "cackpad!"
-  });
-  
-  // initialize?
-  var app = new SelectedPadView({model: selectedPad});
 
   /**
    * Registers all event handlers to bind components and page elements together.
@@ -1153,7 +1208,7 @@
 
 
 
-    d3.select('#show-menu').on('click', function() {
+    d3.select('#show-menu').on('click', function () {
       if (µ.isEmbeddedInIFrame()) {
         window.open(
           'http://earth.nullschool.net/' + window.location.hash,
@@ -1178,41 +1233,43 @@
 
     // Tweak document to distinguish CSS styling between touch and non-touch environments. Hacky hack.
     if ('ontouchstart' in document.documentElement) {
-      d3.select(document).on('touchstart', function() {}); // this hack enables :active pseudoclass
+      d3.select(document).on('touchstart', function () {}); // this hack enables :active pseudoclass
     } else {
       d3.select(document.documentElement).classed('no-touch', true); // to filter styles problematic for touch
     }
 
     // Bind configuration to URL bar changes.
-    d3.select(window).on('hashchange', function() {
+    d3.select(window).on('hashchange', function () {
       log.debug('hashchange');
-      configuration.fetch({ trigger: 'hashchange' });
+      configuration.fetch({
+        trigger: 'hashchange'
+      });
     });
 
     configuration.on('change', report.reset);
 
-    meshAgent.listenTo(configuration, 'change:topology', function(
+    meshAgent.listenTo(configuration, 'change:topology', function (
       context,
       attr
     ) {
       meshAgent.submit(buildMesh, attr);
     });
 
-    globeAgent.listenTo(configuration, 'change:projection', function(
+    globeAgent.listenTo(configuration, 'change:projection', function (
       source,
       attr
     ) {
       globeAgent.submit(buildGlobe, attr);
     });
 
-    gridAgent.listenTo(configuration, 'change', function() {
+    gridAgent.listenTo(configuration, 'change', function () {
       var changed = _.keys(configuration.changedAttributes()),
         rebuildRequired = false;
 
       // Build a new grid if any layer-related attributes have changed.
       if (
         _.intersection(changed, ['date', 'hour', 'param', 'surface', 'level'])
-          .length > 0
+        .length > 0
       ) {
         rebuildRequired = true;
       }
@@ -1238,13 +1295,13 @@
         gridAgent.submit(buildGrids);
       }
     });
-    gridAgent.on('submit', function() {
+    gridAgent.on('submit', function () {
       showGridDetails(null);
     });
-    gridAgent.on('update', function(grids) {
+    gridAgent.on('update', function (grids) {
       showGridDetails(grids);
     });
-    d3.select('#toggle-zone').on('click', function() {
+    d3.select('#toggle-zone').on('click', function () {
       d3.select('#data-date').classed(
         'local',
         !d3.select('#data-date').classed('local')
@@ -1269,6 +1326,7 @@
         gridAgent.value()
       );
     }
+
     function cancelInterpolation() {
       fieldAgent.cancel();
     }
@@ -1277,7 +1335,7 @@
     fieldAgent.listenTo(rendererAgent, 'start', cancelInterpolation);
     fieldAgent.listenTo(rendererAgent, 'redraw', cancelInterpolation);
 
-    animatorAgent.listenTo(fieldAgent, 'update', function(field) {
+    animatorAgent.listenTo(fieldAgent, 'update', function (field) {
       animatorAgent.submit(
         animate,
         globeAgent.value(),
@@ -1301,17 +1359,17 @@
       stopCurrentAnimation.bind(null, false)
     );
 
-    overlayAgent.listenTo(fieldAgent, 'update', function() {
+    overlayAgent.listenTo(fieldAgent, 'update', function () {
       overlayAgent.submit(
         drawOverlay,
         fieldAgent.value(),
         configuration.get('overlayType')
       );
     });
-    overlayAgent.listenTo(rendererAgent, 'start', function() {
+    overlayAgent.listenTo(rendererAgent, 'start', function () {
       overlayAgent.submit(drawOverlay, fieldAgent.value(), null);
     });
-    overlayAgent.listenTo(configuration, 'change', function() {
+    overlayAgent.listenTo(configuration, 'change', function () {
       var changed = _.keys(configuration.changedAttributes());
       // if only overlay relevant flags have changed...
       if (
@@ -1334,7 +1392,7 @@
     );
 
     // Modify menu depending on what mode we're in.
-    configuration.on('change:param', function(context, mode) {
+    configuration.on('change:param', function (context, mode) {
       d3.selectAll('.ocean-mode').classed('invisible', mode !== 'ocean');
       d3.selectAll('.wind-mode').classed('invisible', mode !== 'wind');
       switch (mode) {
@@ -1354,7 +1412,7 @@
     });
 
     // Add handlers for mode buttons.
-    d3.select('#wind-mode-enable').on('click', function() {
+    d3.select('#wind-mode-enable').on('click', function () {
       if (configuration.get('param') !== 'wind') {
         configuration.save({
           param: 'wind',
@@ -1364,10 +1422,10 @@
         });
       }
     });
-    configuration.on('change:param', function(x, param) {
+    configuration.on('change:param', function (x, param) {
       d3.select('#wind-mode-enable').classed('highlighted', param === 'wind');
     });
-    d3.select('#ocean-mode-enable').on('click', function() {
+    d3.select('#ocean-mode-enable').on('click', function () {
       if (configuration.get('param') !== 'ocean') {
         // When switching between modes, there may be no associated data for the current date. So we need
         // find the closest available according to the catalog. This is not necessary if date is "current".
@@ -1384,7 +1442,7 @@
         } else {
           when
             .all(products.productsFor(_.extend(attr, ocean)))
-            .spread(function(product) {
+            .spread(function (product) {
               if (product.date) {
                 configuration.save(
                   _.extend(ocean, µ.dateToConfig(product.date))
@@ -1396,18 +1454,18 @@
         stopCurrentAnimation(true); // cleanup particle artifacts over continents
       }
     });
-    configuration.on('change:param', function(x, param) {
+    configuration.on('change:param', function (x, param) {
       d3.select('#ocean-mode-enable').classed('highlighted', param === 'ocean');
     });
 
     // Add logic to disable buttons that are incompatible with each other.
-    configuration.on('change:overlayType', function(x, ot) {
+    configuration.on('change:overlayType', function (x, ot) {
       d3.select('#surface-level').classed(
         'disabled',
         ot === 'air_density' || ot === 'wind_power_density'
       );
     });
-    configuration.on('change:surface', function(x, s) {
+    configuration.on('change:surface', function (x, s) {
       d3.select('#overlay-air_density').classed('disabled', s === 'surface');
       d3.select('#overlay-wind_power_density').classed(
         'disabled',
@@ -1420,21 +1478,24 @@
     d3.select('#nav-forward-more').on('click', navigate.bind(null, +10));
     d3.select('#nav-backward').on('click', navigate.bind(null, -1));
     d3.select('#nav-forward').on('click', navigate.bind(null, +1));
-    d3.select('#nav-now').on('click', function() {
-      configuration.save({ date: 'current', hour: '' });
+    d3.select('#nav-now').on('click', function () {
+      configuration.save({
+        date: 'current',
+        hour: ''
+      });
     });
 
-    d3.select('#option-show-grid').on('click', function() {
+    d3.select('#option-show-grid').on('click', function () {
       configuration.save({
         showGridPoints: !configuration.get('showGridPoints')
       });
     });
-    configuration.on('change:showGridPoints', function(x, showGridPoints) {
+    configuration.on('change:showGridPoints', function (x, showGridPoints) {
       d3.select('#option-show-grid').classed('highlighted', showGridPoints);
     });
 
     // Add handlers for all wind level buttons.
-    d3.selectAll('.surface').each(function() {
+    d3.selectAll('.surface').each(function () {
       var id = this.id;
       var parts = id.split('-');
       bindButtonToConfiguration('#' + id, {
@@ -1452,25 +1513,34 @@
     });
 
     // Add handlers for all overlay buttons.
-    products.overlayTypes.forEach(function(type) {
-      bindButtonToConfiguration('#overlay-' + type, { overlayType: type });
+    products.overlayTypes.forEach(function (type) {
+      bindButtonToConfiguration('#overlay-' + type, {
+        overlayType: type
+      });
     });
     bindButtonToConfiguration('#overlay-wind', {
       param: 'wind',
       overlayType: 'default'
     });
-    bindButtonToConfiguration('#overlay-ocean-off', { overlayType: 'off' });
-    bindButtonToConfiguration('#overlay-currents', { overlayType: 'default' });
+    bindButtonToConfiguration('#overlay-ocean-off', {
+      overlayType: 'off'
+    });
+    bindButtonToConfiguration('#overlay-currents', {
+      overlayType: 'default'
+    });
 
     // Add handlers for all projection buttons.
-    globes.keys().forEach(function(p) {
-      bindButtonToConfiguration('#' + p, { projection: p, orientation: '' }, [
+    globes.keys().forEach(function (p) {
+      bindButtonToConfiguration('#' + p, {
+        projection: p,
+        orientation: ''
+      }, [
         'projection'
       ]);
     });
 
     // When touch device changes between portrait and landscape, rebuild globe using the new view size.
-    d3.select(window).on('orientationchange', function() {
+    d3.select(window).on('orientationchange', function () {
       view = µ.view();
       globeAgent.submit(buildGlobe, configuration.get('projection'));
     });
