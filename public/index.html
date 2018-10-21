@@ -52,11 +52,21 @@
                 <span id="location-value-units" class="text-button"></span>
             </p>
         </div>
-
+        <p id="earth">
+            <span id="show-menu" class="text-button" title="menu">rocketearth</span>
+            <span id="progress" class="invisible"></span>
+        </p>
+        <script type="text/template" id="launch-template">
+            <div>
+                <p><%= name %></p>
+                <p>lorem ipsum</p>
+            </div>
+        </script>
+        <div id="launch-info" class="invisible">
+            <p>No Data</p>
+        </div>
         <div id="menu" class="invisible">
-            <p>Date | <span
-                id="data-date" class="local"></span> <span
-                id="toggle-zone" class="text-button"></span>
+            <p>Date | <span id="data-date" class="local"></span> <span id="toggle-zone" class="text-button"></span>
             </p>
             <p>Data | <span id="data-layer"></span></p>
             <p>Source | <span id="data-center"></span></p>
@@ -137,5 +147,7 @@
     <script src="/libs/earth/1.0.0/products.js" charset="utf-8"></script>
     <script src="/libs/earth/1.0.0/earth.js" charset="utf-8"></script>
 
+    <script id="menu-root" type="text/html">
+    </script>
 </body>
 </html>

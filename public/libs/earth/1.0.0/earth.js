@@ -6,6 +6,9 @@
  *
  * https://github.com/cambecc/earth
  */
+
+// import "d3";
+
 (function() {
   'use strict';
 
@@ -482,18 +485,36 @@
       }
     }
 
-    function drawLaunchpads(coord) {
-      var mark = d3.select('.location-mark');
-      mark = d3
+    function drawLaunchpad(coord, props) {
+      //var mark = d3.select('.pad-mark');
+      var mark = d3
         .select('#foreground')
         .append('path')
-        .attr('class', 'location-mark');
-      mark.datum({ type: 'Point', coordinates: coord }).attr('d', path);
+        .attr('class', 'pad-mark')
+        .attr('id', "pad" + props.id);
+      mark.datum({ type: 'Point', coordinates: coord, props: props }).attr('d', path);
+      
+      return mark;
     }
 
+    var lastMark = null;
+
+    // read data from all sites and plot pads
     µ.loadJson('/site').then(data => {
+      
+      console.log("plotting pads");
+
       data.pads.forEach(pad => {
-        drawLaunchpads([pad.longitude, pad.latitude]);
+        var mark = drawLaunchpad([pad.longitude, pad.latitude], pad);
+        mark.on("click", () => {
+          console.log("click " + pad.id);
+          
+          // unmark last pad (if any)
+          d3.select(".pad-mark-selected").classed("pad-mark-selected", false);
+
+          // mark this pad
+          mark.classed("pad-mark-selected", true);
+        });
       });
     });
 
@@ -527,8 +548,8 @@
         lakes.datum(mesh.lakesHi);
         d3.selectAll('path').attr('d', path);
         rendererAgent.trigger('render');
-      },
-      click: drawLocationMark
+      },      
+      //click: drawLocationMark
     });
 
     // Finally, inject the globe model into the input controller. Do it on the next event turn to ensure
@@ -1070,6 +1091,53 @@
     });
   }
 
+  // oisin
+
+  // fix up missing jquery
+  Backbone.$ = d3.select;
+
+  // Model
+  const PadModel = Backbone.Model.extend({
+    defaults: {
+      name: 'empty'
+    }
+  });
+
+  // View
+  let SelectedPadView = Backbone.View.extend({
+    // bound element
+    el: "#launch-info",
+
+    // precompile template
+    template: _.template(d3.select("#launch-template").html()),
+
+    initialize: function() {
+      console.log("SelectedPadView.initialize");
+      this.render();
+    },
+
+    render: function() {
+      console.log("SelectedPadView.render");
+
+      // apply model attributes to template
+      this.$el.html(this.template(this.model.attributes));
+
+      // allow fluent invocation
+      return this;
+    },
+
+    update: function() {
+      console.log("SelectedPadView.update");
+    }
+  });
+
+  let selectedPad = new PadModel({
+    name: "cackpad!"
+  });
+  
+  // initialize?
+  var app = new SelectedPadView({model: selectedPad});
+
   /**
    * Registers all event handlers to bind components and page elements together.
    * There must be a cleaner way to accomplish this...
@@ -1082,6 +1150,8 @@
       .attr('height', view.height);
     // Adjust size of the scale canvas to fill the width of the menu to the right of
     // the label.
+
+
 
     d3.select('#show-menu').on('click', function() {
       if (µ.isEmbeddedInIFrame()) {
@@ -1096,6 +1166,10 @@
         );
       }
     });
+
+    // d3.select('.pad-mark').on('click', function() {
+    //   console.log("pad click");
+    // });
 
     if (µ.isFF()) {
       // Workaround FF performance issue of slow click behavior on map having thick coastlines.

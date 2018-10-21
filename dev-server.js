@@ -4,6 +4,16 @@
 
 'use strict';
 
+/*
+  _____            _        _   ______           _   _     
+ |  __ \          | |      | | |  ____|         | | | |    
+ | |__) |___   ___| | _____| |_| |__   __ _ _ __| |_| |__  
+ |  _  // _ \ / __| |/ / _ \ __|  __| / _` | '__| __| '_ \ 
+ | | \ \ (_) | (__|   <  __/ |_| |___| (_| | |  | |_| | | |
+ |_|  \_\___/ \___|_|\_\___|\__|______\__,_|_|   \__|_| |_|
+ 
+*/
+console.log("")
 console.log('============================================================');
 console.log(new Date().toISOString() + ' - Starting');
 
@@ -12,6 +22,9 @@ const express = require('express');
 const request = require('request');
 const url = require('url');
 const util = require('util');
+
+// type
+const NodeCache = require( "node-cache" );
 
 const app = express();
 
@@ -82,7 +95,57 @@ app.use(cacheControl());
 app.use(compression());
 app.use(express.static('public'));
 
-app.get('/site/:siteId?', (req, res) => {
+
+class LaunchCache {
+  
+  constructor() {
+    this.ncache = new NodeCache();
+  }
+
+  async getAsync(key) {
+    return new Promise((resolve, reject) => {
+      this.ncache.get(key, (err, value) => {
+        if (!!err) {
+          reject(err);
+        } else {
+          resolve(value);
+        }
+      })
+    });
+  }
+
+  async putAsync(key, value) {
+    return new Promise((resolve, reject) => {
+      this.ncache.set(key, value, 3600, (err, data) => {
+        if (!!err) {
+          console.warn("cache fail: " + data);
+          reject(err);
+        } else {
+          resolve();
+        }
+      })
+    })
+  }
+}
+
+//var cache = new NodeCache();
+
+
+// helper function to ensure we can chain after failed async/await
+const awaiter = fn => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+}
+
+// app.get('/site/:siteId?', (req, res) => {
+//   preq({
+//     url: flightURL('pad', req.params.siteId, '?limit=999999999'),
+//     json: true
+//   })
+//     .then(data => res.json(data))
+//     .catch(errorCatch);
+// });
+
+app.get('/site/:siteId?', (req, res) => {  
   preq({
     url: flightURL('pad', req.params.siteId, '?limit=999999999'),
     json: true
@@ -106,3 +169,5 @@ app.get('/launch/:launchId?', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}...`);
 });
+
+
