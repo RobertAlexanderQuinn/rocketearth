@@ -494,33 +494,6 @@
     var lakes = d3.select('.lakes');
     d3.selectAll('path').attr('d', path); // do an initial draw -- fixes issue with safari
 
-    function drawLocationMark(point, coord) {
-      // show the location on the map if defined
-      if (
-        fieldAgent.value() &&
-        !fieldAgent.value().isInsideBoundary(point[0], point[1])
-      ) {
-        // UNDONE: Sometimes this is invoked on an old, released field, because new one has not been
-        //         built yet, causing the mark to not get drawn.
-        return; // outside the field boundary, so ignore.
-      }
-      if (coord && _.isFinite(coord[0]) && _.isFinite(coord[1])) {
-        var mark = d3.select('.location-mark');
-        if (!mark.node()) {
-          mark = d3
-            .select('#foreground')
-            .append('path')
-            .attr('class', 'location-mark');
-        }
-        mark
-          .datum({
-            type: 'Point',
-            coordinates: coord
-          })
-          .attr('d', path);
-      }
-    }
-
     function drawLaunchpad(coord, props) {
       //var mark = d3.select('.pad-mark');
       var mark = d3
