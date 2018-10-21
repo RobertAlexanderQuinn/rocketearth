@@ -244,6 +244,19 @@ body {
     fill: none;
 }
 
+.pad-mark {
+    stroke: orange;
+    stroke-width: 2.5;
+    fill: none;
+    cursor: pointer;
+    pointer-events: all; /* YES TAKE THE DAMN CLICK. MOTHERFUCKER SVG PATH. */
+}
+
+.pad-mark-selected {
+    stroke: #3aff3a;
+}
+
+
 /**************************************************************************************************
  * About Page
  **************************************************************************************************/

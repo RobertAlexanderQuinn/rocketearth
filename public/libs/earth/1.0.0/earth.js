@@ -372,18 +372,36 @@
       }
     }
 
-    function drawLaunchpads(coord) {
-      var mark = d3.select('.location-mark');
-      mark = d3
+    function drawLaunchpad(coord, props) {
+      //var mark = d3.select('.pad-mark');
+      var mark = d3
         .select('#foreground')
         .append('path')
-        .attr('class', 'location-mark');
-      mark.datum({ type: 'Point', coordinates: coord }).attr('d', path);
+        .attr('class', 'pad-mark')
+        .attr('id', "pad" + props.id);
+      mark.datum({ type: 'Point', coordinates: coord, props: props }).attr('d', path);
+      
+      return mark;
     }
 
+    var lastMark = null;
+
+    // read data from all sites and plot pads
     µ.loadJson('/site').then(data => {
+      
+      console.log("plotting pads");
+
       data.pads.forEach(pad => {
-        drawLaunchpads([pad.longitude, pad.latitude]);
+        var mark = drawLaunchpad([pad.longitude, pad.latitude], pad);
+        mark.on("click", () => {
+          console.log("click " + pad.id);
+          
+          // unmark last pad (if any)
+          d3.select(".pad-mark-selected").classed("pad-mark-selected", false);
+
+          // mark this pad
+          mark.classed("pad-mark-selected", true);
+        });
       });
     });
 
@@ -417,8 +435,8 @@
         lakes.datum(mesh.lakesHi);
         d3.selectAll('path').attr('d', path);
         rendererAgent.trigger('render');
-      },
-      click: drawLocationMark
+      },      
+      //click: drawLocationMark
     });
 
     // Finally, inject the globe model into the input controller. Do it on the next event turn to ensure
@@ -1035,6 +1053,10 @@
         );
       }
     });
+
+    // d3.select('.pad-mark').on('click', function() {
+    //   console.log("pad click");
+    // });
 
     if (µ.isFF()) {
       // Workaround FF performance issue of slow click behavior on map having thick coastlines.

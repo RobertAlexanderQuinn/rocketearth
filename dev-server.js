@@ -97,9 +97,9 @@ app.use(express.static('public'));
 
 
 class LaunchCache {
-  ncache = new NodeCache();
-
+  
   constructor() {
+    this.ncache = new NodeCache();
   }
 
   async getAsync(key) {
