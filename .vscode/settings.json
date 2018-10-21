@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/d4873088-017e-4d4e-81a4-ded292870bcb/resourceGroups/etshack/providers/Microsoft.Web/sites/rocketearth",
+    "appService.deploySubpath": "public"
+}

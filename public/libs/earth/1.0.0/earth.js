@@ -6,6 +6,9 @@
  *
  * https://github.com/cambecc/earth
  */
+
+// import "d3";
+
 (function() {
   'use strict';
 
@@ -957,6 +960,53 @@
     });
   }
 
+  // oisin
+
+  // fix up missing jquery
+  Backbone.$ = d3.select;
+
+  // Model
+  const PadModel = Backbone.Model.extend({
+    defaults: {
+      name: 'empty'
+    }
+  });
+
+  // View
+  let SelectedPadView = Backbone.View.extend({
+    // bound element
+    el: "#launch-info",
+
+    // precompile template
+    template: _.template(d3.select("#launch-template").html()),
+
+    initialize: function() {
+      console.log("SelectedPadView.initialize");
+      this.render();
+    },
+
+    render: function() {
+      console.log("SelectedPadView.render");
+
+      // apply model attributes to template
+      this.$el.html(this.template(this.model.attributes));
+
+      // allow fluent invocation
+      return this;
+    },
+
+    update: function() {
+      console.log("SelectedPadView.update");
+    }
+  });
+
+  let selectedPad = new PadModel({
+    name: "cackpad!"
+  });
+  
+  // initialize?
+  var app = new SelectedPadView({model: selectedPad});
+
   /**
    * Registers all event handlers to bind components and page elements together.
    * There must be a cleaner way to accomplish this...
@@ -969,6 +1019,8 @@
       .attr('height', view.height);
     // Adjust size of the scale canvas to fill the width of the menu to the right of
     // the label.
+
+
 
     d3.select('#show-menu').on('click', function() {
       if (µ.isEmbeddedInIFrame()) {
