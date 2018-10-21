@@ -113,7 +113,7 @@ var globes = (function() {
        * @returns {Array} the range at which this globe can be zoomed.
        */
       scaleExtent: function() {
-        return [300, 3000];
+        return [300, 100000];
       },
 
       /**
