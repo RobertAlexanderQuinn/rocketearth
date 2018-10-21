@@ -118,7 +118,7 @@ body {
     font-size: 1.75rem;
 }
 
-#status, #location, #earth, #timeline {
+#status, #location, #earth {
     background-color: rgba(5, 10, 30, 0.85);
     border-radius: 0.5rem/0.5rem;
     margin-top: 1rem;
@@ -152,6 +152,21 @@ body {
 
 #progress {
     padding-left: 1rem;
+}
+
+#scrubber {
+    position: absolute;
+}
+
+#timeline-min-date {
+    width: 3px;
+    height: 30px;
+    background-color: white;
+    pointer-events: all;
+}
+
+#timeline-min-date:hover {
+    background-color: red;
 }
 
 #nav-now {

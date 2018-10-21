@@ -198,6 +198,88 @@
       }
     });
 
+    var scrubber = d3.select('#scrubber');
+
+    const scrubberPadding = 60;
+
+    scrubber
+      .append('rect')
+      .attr('fill', 'white')
+      .attr('width', view.width - scrubberPadding * 2)
+      .attr('height', 2)
+      .attr('x', scrubberPadding)
+      .attr('y', view.height - scrubberPadding);
+
+    // Min End
+    scrubber
+      .append('rect')
+      .attr('fill', 'white')
+      .attr('width', 2)
+      .attr('height', 20)
+      .attr('x', scrubberPadding)
+      .attr('y', view.height - scrubberPadding);
+    scrubber
+      .append('text')
+      .text('1961')
+      .attr('font-size', '20px')
+      .attr('fill', 'white')
+      .attr('x', scrubberPadding)
+      .attr('y', view.height - scrubberPadding - 4);
+
+    // Max End
+    scrubber
+      .append('rect')
+      .attr('fill', 'white')
+      .attr('width', 2)
+      .attr('height', 20)
+      .attr('x', view.width - scrubberPadding)
+      .attr('y', view.height - scrubberPadding);
+    scrubber
+      .append('text')
+      .text('2018')
+      .attr('font-size', '20px')
+      .attr('fill', 'white')
+      .attr('text-anchor', 'end')
+      .attr('x', view.width - scrubberPadding)
+      .attr('y', view.height - scrubberPadding - 4);
+
+    // Handles
+    const minHandle = scrubber
+      .append('rect')
+      .attr('fill', '#00ff00')
+      .attr('width', 6)
+      .attr('height', 30)
+      .attr('x', scrubberPadding + 4)
+      .attr('y', view.height - scrubberPadding + 3)
+      .call(
+        d3.behavior.drag().on('drag', function(d) {
+          const pos = µ.clamp(
+            d3.event.x,
+            scrubberPadding + 4,
+            +maxHandle.attr('x') - 10
+          );
+          d3.select(this).attr('x', pos);
+        })
+      );
+
+    const maxHandle = scrubber
+      .append('rect')
+      .attr('width', 6)
+      .attr('height', 30)
+      .attr('fill', '#00ff00')
+      .attr('x', view.width - scrubberPadding - 8)
+      .attr('y', view.height - scrubberPadding + 3)
+      .call(
+        d3.behavior.drag().on('drag', function(d) {
+          const pos = µ.clamp(
+            d3.event.x,
+            +minHandle.attr('x') + 10,
+            view.width - scrubberPadding - 8
+          );
+          d3.select(this).attr('x', pos);
+        })
+      );
+
     function reorient() {
       var options = arguments[3] || {};
       if (!globe || options.source === 'moveEnd') {
