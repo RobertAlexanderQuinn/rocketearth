@@ -9,7 +9,7 @@
     <meta property="og:type"        content="website"/>
     <meta property="og:title"       content="rocketearth"/>
     <meta property="og:description" content="An animated map of past and present rocket launches."/>
-    <meta property="og:url"         content="https://rocketearth.app"/>    
+    <meta property="og:url"         content="https://rocketearth.app"/>
 
     <link rel="shortcut icon" href="/favicon/favicon.ico"/>
     <link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon.png"/>
@@ -59,6 +59,12 @@
                 <p><%= name %></p>
                 <p><%= agency %></p>
                 <p>(launch info)</p>
+                <ul>
+                    <% for (var i = 0; i < launches.length; i++) { %>
+                    <li><%= launches[i].name %></li>
+                    <% } %>
+
+                </ul>
             </div>
         </script>
         <script type="text/template" id="mission-list">
@@ -70,7 +76,7 @@
                 <p><%= mission_description %></p>
                 <p><%= agency_0_name %></p>
                 <p>more info...<p>
-                <ul>                    
+                <ul>
                     <%= agency_0_infoURLs... %>
                 <ul>
             </div>

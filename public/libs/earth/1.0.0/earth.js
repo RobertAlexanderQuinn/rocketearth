@@ -504,25 +504,55 @@
     var lakes = d3.select('.lakes');
     d3.selectAll('path').attr('d', path); // do an initial draw -- fixes issue with safari
 
-    function drawLaunchpad(coord, props) {
-      var mark = d3
+    function drawLaunchpads() {
+      var marks = d3
         .select('#foreground')
+        .selectAll('.pad-marks')
+        .data(window.data.sites.pads)
+        .enter()
         .append('path')
-        .attr('class', 'pad-mark')
-        .attr('id', 'pad' + props.id);
-
-      mark
-        .datum({
+        .classed('pad-mark', true)
+        .attr('id', d => 'pad' + d.id)
+        .datum(d => ({
           type: 'Point',
-          coordinates: coord,
-          props: props
-        })
-        .attr('d', path);
+          coordinates: [d.longitude, d.latitude],
+          props: d,
+          selected: false
+        }))
+        .on('click', function(d) {
+          d3.select('.pad-mark-selected').classed('pad-mark-selected', false);
+          d3.select(this).classed('pad-mark-selected', true);
 
-      return mark;
+          var agency = 'no agency';
+          if (d.props.agencies && d.props.agencies.length > 0) {
+            agency = d.props.agencies.map(a => a.name).join(', ');
+          }
+
+          console.log(d.props);
+          var now = new Date().getTime();
+          var launches = Object.keys(window.data.launches).reduce((a, id) => {
+            let launch = window.data.launches[id];
+            let launchtime = new Date(launch.net).getTime();
+            let launchPadId = launch.location.pads.length
+              ? launch.location.pads[0].id
+              : -9999;
+            if (
+              launchPadId === d.props.id &&
+              launchtime > now &&
+              launchtime < now + 1000 * 60 * 60 * 24 * 60
+            ) {
+              a.push(launch);
+            }
+            return a;
+          }, []);
+
+          selectedPad.set({
+            name: d.props.name,
+            agency: agency,
+            launches: launches
+          });
+        });
     }
-
-    // oisin
 
     // fix up missing jquery
     Backbone.$ = d3.select;
@@ -574,28 +604,11 @@
     });
 
     // read data from all sites and plot pads
-    window.data.sites.pads.forEach(pad => {
-      var mark = drawLaunchpad([pad.longitude, pad.latitude], pad);
+    drawLaunchpads();
+    // window.data.sites.pads.forEach(pad => {
+    //   var mark = drawLaunchpad([pad.longitude, pad.latitude], pad);
 
-      mark.on('click', () => {
-        // unmark last pad (if any)
-        d3.select('.pad-mark-selected').classed('pad-mark-selected', false);
-
-        // mark this pad
-        mark.classed('pad-mark-selected', true);
-
-        //d3.select("#launch-info").classed("invisible". false);
-
-        var agency = 'no agency';
-        if (pad.agencies && pad.agencies.length > 0) {
-          agency = pad.agencies[0].name;
-        }
-        selectedPad.set({
-          name: pad.name,
-          agency: agency
-        });
-      });
-    });
+    //       // });
 
     // Throttled draw method helps with slow devices that would get overwhelmed by too many redraw events.
     var REDRAW_WAIT = 5; // milliseconds
