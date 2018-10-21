@@ -5,15 +5,15 @@
 'use strict';
 
 /*
-  _____            _        _   ______           _   _     
- |  __ \          | |      | | |  ____|         | | | |    
- | |__) |___   ___| | _____| |_| |__   __ _ _ __| |_| |__  
- |  _  // _ \ / __| |/ / _ \ __|  __| / _` | '__| __| '_ \ 
+  _____            _        _   ______           _   _
+ |  __ \          | |      | | |  ____|         | | | |
+ | |__) |___   ___| | _____| |_| |__   __ _ _ __| |_| |__
+ |  _  // _ \ / __| |/ / _ \ __|  __| / _` | '__| __| '_ \
  | | \ \ (_) | (__|   <  __/ |_| |___| (_| | |  | |_| | | |
  |_|  \_\___/ \___|_|\_\___|\__|______\__,_|_|   \__|_| |_|
- 
+
 */
-console.log("")
+console.log('');
 console.log('============================================================');
 console.log(new Date().toISOString() + ' - Starting');
 
@@ -22,10 +22,10 @@ const express = require('express');
 const request = require('request');
 const url = require('url');
 const util = require('util');
+const NodeCache = require('node-cache');
 
-// type
-const NodeCache = require( "node-cache" );
-
+// One hour TTL
+const pcache = new PromiseCache({ ttl: 60 * 60 });
 const app = express();
 
 const PORT = process.argv[2] || 8080;
@@ -34,13 +34,40 @@ const DARK_SKY_API_KEY = process.env['DARK_SKY_API_KEY'];
 const FLIGHT_DATA_URL = 'https://launchlibrary.net/1.4/';
 const DARK_SKY_URL = `https://api.darksky.net/forecast/${DARK_SKY_API_KEY}/{lat},{lng},{time}`;
 
+// Wrapper for get and set with promises.
+function PromiseCache(opts) {
+  this.cache = new NodeCache(opts);
+
+  this.get = function(key) {
+    return new Promise((resolve, reject) => {
+      this.cache.get(key, (err, data) => {
+        return err ? reject(err) : resolve(data);
+      });
+    });
+  };
+
+  this.set = function(key, value) {
+    return new Promise((resolve, reject) => {
+      this.cache.set(key, value, (err, success) => {
+        return err ? reject(err) : resolve(success);
+      });
+    });
+  };
+}
+
 /**
- * Adds headers to a response to enable caching.
+ * Adds headers to a response to enable caching and returns cached value
+ * if it has been set (manually, that is).
  */
 function cacheControl() {
   return function(req, res, next) {
     res.setHeader('Cache-Control', 'public, max-age=300');
-    return next();
+
+    let key = req.originalUrl || req.url;
+    return pcache
+      .get(key)
+      .then(cached => (cached ? res.json(cached) : next()))
+      .catch(e => next());
   };
 }
 
@@ -91,13 +118,7 @@ function errorCatch(err) {
   console.error(err);
 }
 
-app.use(cacheControl());
-app.use(compression());
-app.use(express.static('public'));
-
-
 class LaunchCache {
-  
   constructor() {
     this.ncache = new NodeCache();
   }
@@ -110,7 +131,7 @@ class LaunchCache {
         } else {
           resolve(value);
         }
-      })
+      });
     });
   }
 
@@ -118,34 +139,43 @@ class LaunchCache {
     return new Promise((resolve, reject) => {
       this.ncache.set(key, value, 3600, (err, data) => {
         if (!!err) {
-          console.warn("cache fail: " + data);
+          console.warn('cache fail: ' + data);
           reject(err);
         } else {
           resolve();
         }
-      })
-    })
+      });
+    });
   }
 }
 
-//var cache = new NodeCache();
+function constructData(d) {
+  const sites = d[0];
 
+  function toMap(a, el) {
+    a[el.id] = el;
+    return a;
+  }
+
+  return {
+    sites: d[0],
+    locations: d[1].locations.reduce(toMap, {}),
+    agencies: d[2].agencies.reduce(toMap, {}),
+    launches: d[3].launches.reduce(toMap, {}),
+    missions: d[4].missions.reduce(toMap, {})
+  };
+}
 
 // helper function to ensure we can chain after failed async/await
 const awaiter = fn => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch(next);
-}
+};
 
-// app.get('/site/:siteId?', (req, res) => {
-//   preq({
-//     url: flightURL('pad', req.params.siteId, '?limit=999999999'),
-//     json: true
-//   })
-//     .then(data => res.json(data))
-//     .catch(errorCatch);
-// });
+app.use(cacheControl());
+app.use(compression());
+app.use(express.static('public'));
 
-app.get('/site/:siteId?', (req, res) => {  
+app.get('/site/:siteId?', (req, res) => {
   preq({
     url: flightURL('pad', req.params.siteId, '?limit=999999999'),
     json: true
@@ -166,8 +196,31 @@ app.get('/launch/:launchId?', (req, res) => {
     .catch(errorCatch);
 });
 
+app.get('/data', (req, res) => {
+  console.log('called data...');
+  const nolim = '?limit=9999999';
+
+  // Sorry launchlib!
+  const sites = preq({ url: flightURL('pad', nolim), json: true });
+  const locations = preq({ url: flightURL('location', nolim), json: true });
+  const agencies = preq({ url: flightURL('agency', nolim), json: true });
+  const launches = preq({ url: flightURL('launch', nolim), json: true });
+  const missions = preq({ url: flightURL('mission', nolim), json: true });
+
+  const getData = Promise.all([
+    sites,
+    locations,
+    agencies,
+    launches,
+    missions
+  ]).catch(e => console.error(e));
+
+  getData.then(constructData).then(d => {
+    pcache.set(req.originalUrl || req.url, d);
+    res.json(d);
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}...`);
 });
-
-
