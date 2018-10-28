@@ -1548,7 +1548,7 @@
 
   when(true)
     .then(() => {
-      return µ.loadJson('/data').then(data => {
+      return µ.loadJson('/sync').then(data => {
         console.log('data loaded');
         window.data = data;
       });

@@ -4,7 +4,8 @@
     "version": "0.0.1",
     "private": true,
     "scripts": {
-        "start": "node dev-server.js"
+        "start": "node dev-server.js",
+        "bundle": "parcel ./public/*.html"
     },
     "homepage": "https://github.com/oising/rocketearth",
     "repository": {
@@ -13,6 +14,7 @@
     },
     "engine": "node >= 8.0.0",
     "dependencies": {
+        "@types/node-fetch": "^2.1.2",
         "compression": "^1.7.3",
         "express": "4.16.4",
         "mkdirp": "0.5.1",
@@ -29,6 +31,8 @@
         "@types/underscore": "^1.8.9",
         "@types/when": "^2.4.33",
         "grunt": "1.0.3",
-        "grunt-contrib-jshint": "2.0.0"
+        "grunt-contrib-jshint": "2.0.0",
+        "parcel-bundler": "^1.10.3",
+        "quicktype": "^15.0.144"
     }
 }
