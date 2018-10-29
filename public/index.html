@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html itemscope itemtype="http://schema.org/Map" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
 <head>
     <meta charset="utf-8"/>
@@ -13,135 +13,143 @@
 
     <link rel="shortcut icon" href="/favicon/favicon.ico"/>
     <link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-icon.png"/>
-    <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png"/>
+    <link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-icon-152x152.png"/>
     <link rel="stylesheet" type="text/css" href="/styles/styles.css"/>
     <link rel="alternate" hreflang="x-default" href="https://rocketearth.app/"/>
 </head>
 <body data-lang="en">
-<div id="container">
-    <!--[if lte IE 8]><p id="warn">This site requires IE9 or newer.</p><![endif]-->
+    <div id="container" style="display: flex; justify-content: space-between">
+        <!--[if lte IE 11]><p id="warn">This site requires IE11 or newer.</p><![endif]-->
 
-    <div id="display">
-        <svg id="map" class="fill-screen" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
-        <canvas id="animation" class="fill-screen"></canvas>
-        <canvas id="overlay" class="fill-screen"></canvas>
-        <svg id="foreground" class="fill-screen" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
-        <svg id="scrubber" class="fill-screen" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
-    </div>
-    <div id="details">
-        <p id="status"></p>
-        <p id="earth">
-            <span id="show-menu" class="text-button" title="menu">Display Settings</span>
-            <span id="progress" class="invisible"></span>
-        </p>
-
-        <div id="location">
-            <p>
-                <span id="location-coord"></span>
-                <span id="location-close" class="invisible text-button"> ✕ </span>
-            </p>
-            <p>
-                <span id="location-wind"></span>
-                <span id="location-wind-units" class="text-button"></span>
-            </p>
-            <p>
-                <span id="location-value"></span>
-                <span id="location-value-units" class="text-button"></span>
-            </p>
+        <div id="display">
+            <svg id="map" class="fill-screen" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
+            <canvas id="animation" class="fill-screen"></canvas>
+            <canvas id="overlay" class="fill-screen"></canvas>
+            <svg id="foreground" class="fill-screen" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
+            <svg id="scrubber" class="fill-screen" xmlns="http://www.w3.org/2000/svg" version="1.1"></svg>
         </div>
-        <!-- actually for pad data -->
-        <script type="text/template" id="launch-template">
-            <div>
-                <p><%= name %></p>
-                <p><%= agency %></p>
-                <ul style="text-align: left">
 
-                    <% if (launches.length) { for (var i = 0; i < launches.length; i++) { %>
-                    <li><%= launches[i].name %></li>
-                    <% } } else { %>
-                    <li>No launches coming up</li>
-                    <% } %>
+        <div id="left" style="width:50%">
+                <div id="details">
+                    <p id="status"></p>
+                    <p id="earth">
+                        <span id="show-menu" class="text-button" title="menu">Display Settings</span>
+                        <span id="progress" class="invisible"></span>
+                    </p>
 
-                </ul>
-            </div>
-        </script>
-        <script type="text/template" id="mission-list">
-            TODO
-        </script>
-        <script type="text/template" id="mission-item">
-            <div>
-                <p><%= mission_name %></p>
-                <p><%= mission_description %></p>
-                <p><%= agency_0_name %></p>
-                <p>more info...<p>
-                <ul>
-                    <%= agency_0_infoURLs... %>
-                <ul>
-            </div>
-        </script>
-        <div id="launch-info" class="">
-            <p>No Data</p>
+                    <div id="location">
+                        <p>
+                            <span id="location-coord"></span>
+                            <span id="location-close" class="invisible text-button"> ✕ </span>
+                        </p>
+                        <p>
+                            <span id="location-wind"></span>
+                            <span id="location-wind-units" class="text-button"></span>
+                        </p>
+                        <p>
+                            <span id="location-value"></span>
+                            <span id="location-value-units" class="text-button"></span>
+                        </p>
+                    </div>                
+                    <div id="menu" class="invisible">
+                        <p>Date | <span id="data-date" class="local"></span> <span id="toggle-zone" class="text-button"></span></p>
+                        <p>Data | <span id="data-layer"></span></p>
+                        <p>Source | <span id="data-center"></span></p>
+                        <p>Control | <span
+                            class="text-button" id="nav-now" title="Current Conditions">Now</span><span
+                            class="text-button" id="nav-backward-more"> « </span> – <span
+                            class="text-button" id="nav-backward"> ‹ </span> – <span
+                            class="text-button" id="nav-forward"> › </span> – <span
+                            class="text-button" id="nav-forward-more"> » </span><span
+                            class="text-button" id="show-location" title="Current Position">〖◯〗</span><span
+                            class="text-button" id="option-show-grid" title="Toggle Grid">Grid</span>
+                        </p>
+                        <p>Mode | <span
+                            class="text-button" id="wind-mode-enable">Air</span> – <span
+                            class="text-button" id="ocean-mode-enable">Ocean</span>
+                        </p>
+                        <p class="wind-mode">Height | <span
+                            class="surface text-button" id="surface-level" title="Surface">Sfc</span> – <span
+                            class="surface text-button" id="isobaric-1000hPa">1000</span> – <span
+                            class="surface text-button" id="isobaric-850hPa">850</span> – <span
+                            class="surface text-button" id="isobaric-700hPa">700</span> – <span
+                            class="surface text-button" id="isobaric-500hPa">500</span> – <span
+                            class="surface text-button" id="isobaric-250hPa">250</span> – <span
+                            class="surface text-button" id="isobaric-70hPa">70</span> – <span
+                            class="surface text-button" id="isobaric-10hPa">10</span> hPa
+                        </p>
+                        <p class="wind-mode">Overlay | <span
+                            class="text-button" id="overlay-off">None</span> – <span
+                            class="text-button" id="overlay-wind" title="Wind Speed">Wind</span> – <span
+                            class="text-button" id="overlay-temp" title="Temperature">Temp</span> – <span
+                            class="text-button" id="overlay-relative_humidity" title="Relative Humidity">RH</span> – <span
+                            class="text-button" id="overlay-air_density" title="Air Density">AD</span> – <span
+                            class="text-button" id="overlay-wind_power_density" title="Wind Power Density">WPD</span>
+                        </p>
+                        <p class="wind-mode"><span style="visibility:hidden">Overlay</span> | <span
+                            class="text-button" id="overlay-total_precipitable_water" title="Total Precipitable Water">TPW</span> – <span
+                            class="text-button" id="overlay-total_cloud_water" title="Total Cloud Water">TCW</span> – <span
+                            class="text-button" id="overlay-mean_sea_level_pressure" title="Mean Sea Level Pressure">MSLP</span>
+                        </p>
+                        <p class="ocean-mode invisible">Animate | <span
+                            class="text-button" id="animate-currents" title="Currents">Currents</span>
+                        </p>
+                        <p class="ocean-mode invisible">Overlay | <span
+                            class="text-button" id="overlay-ocean-off">None</span> – <span
+                            class="text-button" id="overlay-currents" title="Currents">Currents</span>
+                        </p>
+                        <p class="ocean-mode invisible"><span style="visibility:hidden">Overlay</span> |</p>
+                        <p>Projection | <span
+                            class="proj text-button" id="equirectangular" title="Equirectangular">E</span> – <span
+                            class="proj text-button" id="orthographic" title="Orthographic">O</span> – <span
+                        </p>
+                        <p>
+                            <a href="about.html" class="internal-link">about</a>
+                            <a href="https://www.facebook.com/EarthWindMap" class="social-icon" title="Facebook">&#xe027;</a>
+                            <a href="https://twitter.com/cambecc" class="social-icon" title="Twitter">&#xe086;</a>
+                        </p>
+                    </div>
+                    <div id="launch-info" class="">
+                        <p>Choose Spaceport &gt;&gt;</p>
+                    </div>
+                </div>
         </div>
-        <div id="menu" class="invisible">
-            <p>Date | <span id="data-date" class="local"></span> <span id="toggle-zone" class="text-button"></span>
-            </p>
-            <p>Data | <span id="data-layer"></span></p>
-            <p>Source | <span id="data-center"></span></p>
-            <p>Control | <span
-                class="text-button" id="nav-now" title="Current Conditions">Now</span><span
-                class="text-button" id="nav-backward-more"> « </span> – <span
-                class="text-button" id="nav-backward"> ‹ </span> – <span
-                class="text-button" id="nav-forward"> › </span> – <span
-                class="text-button" id="nav-forward-more"> » </span><span
-                class="text-button" id="show-location" title="Current Position">〖◯〗</span><span
-                class="text-button" id="option-show-grid" title="Toggle Grid">Grid</span>
-            </p>
-            <p>Mode | <span
-                class="text-button" id="wind-mode-enable">Air</span> – <span
-                class="text-button" id="ocean-mode-enable">Ocean</span>
-            </p>
-            <p class="wind-mode">Height | <span
-                class="surface text-button" id="surface-level" title="Surface">Sfc</span> – <span
-                class="surface text-button" id="isobaric-1000hPa">1000</span> – <span
-                class="surface text-button" id="isobaric-850hPa">850</span> – <span
-                class="surface text-button" id="isobaric-700hPa">700</span> – <span
-                class="surface text-button" id="isobaric-500hPa">500</span> – <span
-                class="surface text-button" id="isobaric-250hPa">250</span> – <span
-                class="surface text-button" id="isobaric-70hPa">70</span> – <span
-                class="surface text-button" id="isobaric-10hPa">10</span> hPa
-            </p>
-            <p class="wind-mode">Overlay | <span
-                class="text-button" id="overlay-off">None</span> – <span
-                class="text-button" id="overlay-wind" title="Wind Speed">Wind</span> – <span
-                class="text-button" id="overlay-temp" title="Temperature">Temp</span> – <span
-                class="text-button" id="overlay-relative_humidity" title="Relative Humidity">RH</span> – <span
-                class="text-button" id="overlay-air_density" title="Air Density">AD</span> – <span
-                class="text-button" id="overlay-wind_power_density" title="Wind Power Density">WPD</span>
-            </p>
-            <p class="wind-mode"><span style="visibility:hidden">Overlay</span> | <span
-                class="text-button" id="overlay-total_precipitable_water" title="Total Precipitable Water">TPW</span> – <span
-                class="text-button" id="overlay-total_cloud_water" title="Total Cloud Water">TCW</span> – <span
-                class="text-button" id="overlay-mean_sea_level_pressure" title="Mean Sea Level Pressure">MSLP</span>
-            </p>
-            <p class="ocean-mode invisible">Animate | <span
-                class="text-button" id="animate-currents" title="Currents">Currents</span>
-            </p>
-            <p class="ocean-mode invisible">Overlay | <span
-                class="text-button" id="overlay-ocean-off">None</span> – <span
-                class="text-button" id="overlay-currents" title="Currents">Currents</span>
-            </p>
-            <p class="ocean-mode invisible"><span style="visibility:hidden">Overlay</span> |</p>
-            <p>Projection | <span
-                class="proj text-button" id="equirectangular" title="Equirectangular">E</span> – <span
-                class="proj text-button" id="orthographic" title="Orthographic">O</span> – <span
-            </p>
-            <p>
-                <a href="about.html" class="internal-link">about</a>
-                <a href="https://www.facebook.com/EarthWindMap" class="social-icon" title="Facebook">&#xe027;</a>
-                <a href="https://twitter.com/cambecc" class="social-icon" title="Twitter">&#xe086;</a>
-            </p>
+
+        <div id="right" style="width:50%">
+            <div id="metadata" style="display:flex; flex-direction: column;align-items:flex-end">
+            <div id="spaceport-info" class="invisible" style="padding: 2%; z-index: 1">
+                <p>No Spaceport Selected</p>
+            </div>
+        </div>
         </div>
     </div>
+    
+    <script type="text/template" id="launch-template">
+        <div>
+            <p><%= name %></p>
+            <p><%= agency %></p>
+            <ul style="text-align: left">
+
+                <% if (launches.length) { for (var i = 0; i < launches.length; i++) {
+                    console.log(launches[i]);
+                    %>
+                <li><span class="text-button"><%= launches[i].name %></span></li>
+                <% } } else { %>
+                <li>No launches coming up</li>
+                <% } %>
+            </ul>
+        </div>
+    </script>
+    
+    <script type="text/template" id="spaceport-template">
+        <div>
+            <p><u><b><%= displayTitle %></b></u></p>
+            <img src='<%= thumbnail %>' width='<%=thumbx%>'' height='<%=thumby %>' align=right>
+            <p><%= description %></p>
+            <p></p>
+            <%= extract %>
+        </div>
+    </script>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js" charset="utf-8"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js" charset="utf-8"></script>
@@ -163,6 +171,10 @@
     <script src="/libs/earth/1.0.0/globes.js" charset="utf-8"></script>
     <script src="/libs/earth/1.0.0/products.js" charset="utf-8"></script>
     <script src="/libs/earth/1.0.0/earth.js" charset="utf-8"></script>
-</div>
+    
+    <!--
+    <script type="module" src="/libs/earth/1.0.0/launches.js"></script>
+     -->
+
 </body>
 </html>

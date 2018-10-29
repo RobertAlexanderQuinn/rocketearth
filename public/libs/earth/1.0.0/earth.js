@@ -551,6 +551,36 @@
             agency: agency,
             launches: launches
           });
+
+          // extract wikidata for pad (essentially the spaceport)
+          let spaceportKey = d.props.wikiURL;
+          console.log("spaceport: " + spaceportKey);
+          spaceportKey = spaceportKey.substring(spaceportKey.lastIndexOf("/") + 1);
+
+          // extra wikidata for the agency/lsp (e.g. ariancespace)
+          let agencyKey = d.props.agencies[0].wikiURL;
+          console.log("agency: " + agencyKey);
+          agencyKey = agencyKey.substring(agencyKey.lastIndexOf("/") + 1);
+
+
+
+          const root = "https://en.wikipedia.org/api/rest_v1/page/summary/";
+          window.fetch(root + spaceportKey).then(r => r.json()).then(d => {
+          
+            spaceport.set({
+              displayTitle: d.displaytitle,
+              description: d.description,
+              extract: d.extract_html,
+              thumbnail: d.thumbnail.source,
+              thumbx: d.thumbnail.width,
+              thumby: d.thumbnail.height
+            });
+            
+            if (d3.select("#spaceport-info").classed("invisible")) {
+              d3.select("#spaceport-info").classed("invisible", false); 
+            }
+          
+          });
         });
     }
 
@@ -565,19 +595,45 @@
       }
     });
 
+    const SpaceportModel = Backbone.Model.extend({
+      defaults: {
+        displayTitle: 'spaceport',
+        description: 'template'
+      }
+    });
+
+    const SpaceportView = Backbone.View.extend({
+      el: '#spaceport-info',
+
+      template: _.template(d3.select('#spaceport-template').html()),
+      initialize: function() {
+        console.log('SpaceportView.initialize');
+        this.model.on('change', this.render, this); // 3rd arg is bind context (this)
+      },
+      render: function() {
+        console.log('SpaceportView.render');
+
+        // apply model attributes to template
+        this.$el.html(this.template(this.model.attributes));
+
+        // allow fluent invocation
+        return this;
+      },
+      update: function() {
+        console.log('SpaceportView.update');
+      }
+    })
+
     // View
     const SelectedPadView = Backbone.View.extend({
       // bound element
       el: '#launch-info',
-
       // precompile template
       template: _.template(d3.select('#launch-template').html()),
-
       initialize: function() {
         console.log('SelectedPadView.initialize');
         this.model.on('change', this.render, this); // 3rd arg is bind context (this)
       },
-
       render: function() {
         console.log('SelectedPadView.render');
 
@@ -587,7 +643,6 @@
         // allow fluent invocation
         return this;
       },
-
       update: function() {
         console.log('SelectedPadView.update');
       }
@@ -598,10 +653,19 @@
       agency: 'agency'
     });
 
-    // initialize?
-    var app = new SelectedPadView({
-      model: selectedPad
+    let spaceport = new SpaceportModel({
+      name: 'spaceport',
+      description: 'description'
     });
+
+    // initialize?
+    var app = [
+      new SelectedPadView({
+        model: selectedPad
+      }),
+      new SpaceportView({
+        model: spaceport
+      })];
 
     // read data from all sites and plot pads
     drawLaunchpads();
@@ -1548,7 +1612,7 @@
 
   when(true)
     .then(() => {
-      return µ.loadJson('/data').then(data => {
+      return µ.loadJson('/sync').then(data => {
         console.log('data loaded');
         window.data = data;
       });

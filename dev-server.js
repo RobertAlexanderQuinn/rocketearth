@@ -21,6 +21,8 @@ const compression = require('compression');
 const express = require('express');
 const request = require('request');
 const url = require('url');
+const fs = require('fs');
+const fetch = require('node-fetch');
 const util = require('util');
 const NodeCache = require('node-cache');
 
@@ -196,8 +198,17 @@ app.get('/launch/:launchId?', (req, res) => {
     .catch(errorCatch);
 });
 
-app.get('/data', (req, res) => {
-  console.log('called data...');
+app.get('/sync', async (req, res) => {
+  console.log('called sync...');
+
+  let response = await fetch('http://localhost:8080/data/launchdata.json');
+  let launchData = await response.json();
+
+  console.log('retrieved cached launchdata.json');
+  res.json(launchData);
+  
+  return;
+
   const nolim = '?limit=9999999';
 
   // Sorry launchlib!
