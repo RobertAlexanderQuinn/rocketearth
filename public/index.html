@@ -116,9 +116,11 @@
         </div>
 
         <div id="right" style="width:50%">
-            <div id="#spaceport-info" class="" style="text-align: right; padding: 2%">
+            <div id="metadata" style="display:flex; flex-direction: column;align-items:flex-end">
+            <div id="spaceport-info" class="invisible" style="padding: 2%; z-index: 1">
                 <p>No Spaceport Selected</p>
             </div>
+        </div>
         </div>
     </div>
     
@@ -131,7 +133,7 @@
                 <% if (launches.length) { for (var i = 0; i < launches.length; i++) {
                     console.log(launches[i]);
                     %>
-                <li><a href="#" onclick='return showLaunchInfo(<%= launches[i].id %>)'><%= launches[i].name %></a></li>
+                <li><span class="text-button"><%= launches[i].name %></span></li>
                 <% } } else { %>
                 <li>No launches coming up</li>
                 <% } %>
@@ -141,10 +143,11 @@
     
     <script type="text/template" id="spaceport-template">
         <div>
-            <p><img src='<%= thumbnail %>' width='<%=thumbx%>'' height='<%=thumby %>'></p>
-            <p><%= displayTitle %></p>
+            <p><u><b><%= displayTitle %></b></u></p>
+            <img src='<%= thumbnail %>' width='<%=thumbx%>'' height='<%=thumby %>' align=right>
             <p><%= description %></p>
-            <%= extract_html %>
+            <p></p>
+            <%= extract %>
         </div>
     </script>
 

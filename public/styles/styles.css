@@ -43,12 +43,6 @@ body {
     position: relative;
  }
 
-/*
-#left, #right {
-    width: 25%;
-}
-*/
-
 a, .text-button {
     color: #888888;
 }
@@ -144,8 +138,8 @@ body {
     font-size: 1rem;
 }
 
-#menu, #launch-info, #mission-info {
-    background-color: rgba(5, 10, 30, 0.85);
+#menu, #launch-info, #spaceport-info {
+    background-color: rgba(25, 35, 75, 0.85);
     border-radius: 0.5rem/0.5rem;
     overflow: hidden;
     pointer-events: all;
@@ -156,9 +150,10 @@ body {
     max-height: 34rem;
     transition: opacity 250ms ease, max-height 250ms ease, margin-top 250ms ease;
     -webkit-transition: opacity 250ms ease, max-height 250ms ease, margin-top 250ms ease;
+    z-index: 99;
 }
 
-#menu.invisible, #launch-info.invisible, #mission-info.invisible {
+#menu.invisible, #launch-info.invisible, #spaceport-info.invisible {
     margin-top: 0;
     padding: 0 1rem 0 1rem;
     opacity: 0;
