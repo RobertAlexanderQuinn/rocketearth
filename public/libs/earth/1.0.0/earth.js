@@ -551,6 +551,20 @@
             agency: agency,
             launches: launches
           });
+
+          // extract wikidata for pad (essentially the spaceport)
+          let spaceportKey = d.props.wikiURL;
+          console.log("spaceport: " + spaceportKey);
+          spaceportKey = spaceportKey.substring(spaceportKey.lastIndexOf("/") + 1);
+
+          // extra wikidata for the agency/lsp (e.g. ariancespace)
+          let agencyKey = d.props.agencies[0].wikiURL;
+          console.log("agency: " + agencyKey);
+          agencyKey = agencyKey.substring(agencyKey.lastIndexOf("/") + 1);
+
+
+          const root = "https://en.wikipedia.org/api/rest_v1/page/summary/";
+          window.fetch(root + spaceportKey).then(r => r.json()).then(d => { console.log(d); });
         });
     }
 
